@@ -3,8 +3,8 @@
 
 int main() {
   std::cout << "Cheese grater" << std::endl;
-  Pawn pawn = Pawn();
-  for(auto m : pawn.getMoves()) {
+  auto piece = Queen();
+  for(auto m : piece.getMoves(5, 5)) {
     std::cout << m << std::endl;
   }
   return 0;
