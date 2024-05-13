@@ -12,7 +12,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-set(PROJECT_SOURCES)
+set(API_FOLDER CheesyApi)
+set(API_SOURCES
+   ${API_FOLDER}/piece.h
+   ${API_FOLDER}/pieces.h
+)
+set(BOT_SOURCES)
+set(PROJECT_SOURCES ${API_SOURCES} ${BOT_SOURCES})
 
 add_executable(entry main.cpp ${PROJECT_SOURCES} )
 
