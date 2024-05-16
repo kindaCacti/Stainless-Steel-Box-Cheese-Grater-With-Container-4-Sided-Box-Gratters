@@ -15,8 +15,9 @@ FetchContent_MakeAvailable(googletest)
 set(API_FOLDER CheesyApi)
 set(API_SOURCES
    ${API_FOLDER}/piece.h
-   ${API_FOLDER}/piece.cpp
    ${API_FOLDER}/pieces.h
+   ${API_FOLDER}/cheeseApi.h
+   ${API_FOLDER}/cheeseApi.cpp
 )
 set(BOT_SOURCES)
 set(PROJECT_SOURCES ${API_SOURCES} ${BOT_SOURCES})

@@ -1,11 +1,10 @@
 #include <iostream>
-#include "CheesyApi/pieces.h"
+#include "CheesyApi/cheeseApi.h"
 
 int main() {
   std::cout << "Cheese grater" << std::endl;
-  auto piece = Queen();
-  for(auto m : piece.getMoves(5, 5)) {
-    std::cout << m << std::endl;
-  }
+  CheeseAPI api = CheeseAPI();
+  std::cout << api << std::endl;
+  api.printMoves(1, 6);
   return 0;
 }
