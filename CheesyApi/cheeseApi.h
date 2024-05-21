@@ -6,14 +6,17 @@
 class CheeseAPI {
 
   Piece* board[8][8] = {nullptr};
+  Move whiteKingPos;
+  Move blackKingPos;
 
 public:
 
   CheeseAPI();
 
   void spawnPiece(Piece* piece, int x, int y, int color);
-  bool posInRange(int x, int y);
-  int posColor(int x, int y);
+  bool posInRange(int x, int y) const;
+  int posColor(int x, int y) const;
+  bool isKingInDanger(int color) const;
   std::vector<Move> getPieceAvailableMoves(int x, int y);
   Piece* movePiece(int x, int y, int dx, int dy);
   auto const getBoard() { return board; }
