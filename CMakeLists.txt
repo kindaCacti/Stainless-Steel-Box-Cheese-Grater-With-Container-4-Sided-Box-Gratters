@@ -21,7 +21,6 @@ set(API_SOURCES
 )
 set(BOT_SOURCES
    ${BOT_FOLDER}/bot.h
-   ${BOT_FOLDER}/main.cpp
 )
 
 set(PROJECT_SOURCES ${API_SOURCES} ${BOT_SOURCES})
