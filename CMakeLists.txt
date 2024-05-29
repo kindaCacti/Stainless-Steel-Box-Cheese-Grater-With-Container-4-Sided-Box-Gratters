@@ -16,8 +16,9 @@ set(API_FOLDER CheesyApi)
 set(BOT_FOLDER CheesyBot)
 set(API_SOURCES
    ${API_FOLDER}/piece.h
-   ${API_FOLDER}/piece.cpp
    ${API_FOLDER}/pieces.h
+   ${API_FOLDER}/cheeseApi.h
+   ${API_FOLDER}/cheeseApi.cpp
 )
 set(BOT_SOURCES
    ${BOT_FOLDER}/bot.h
