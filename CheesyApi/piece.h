@@ -60,6 +60,7 @@ public:
   int getColor() const { return color; }
   std::string const& getName() const { return name; }
   std::string uniqueStamp() {return (name + std::to_string(color)); }
+  int getWeight() {return weight;}
 
   friend std::ostream& operator<<(std::ostream& os, Piece const& piece) {
     return os << piece.name;

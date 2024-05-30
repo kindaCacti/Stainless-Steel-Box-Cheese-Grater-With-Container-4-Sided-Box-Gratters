@@ -9,6 +9,7 @@ int main() {
   CheeseBotAPI cba;
   cba.getMove(api);
   std::cout<<cba.getTreeSize()<<std::endl;
+  cba.showResolvedTree();
   api.printMoves(1, 6);
   return 0;
 }
