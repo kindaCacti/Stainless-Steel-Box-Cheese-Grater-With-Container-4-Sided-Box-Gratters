@@ -1,54 +1,63 @@
 #pragma once
 #include "../CheesyApi/piece.h"
+#include "../CheesyApi/cheeseApi.h"
 #include <vector>
-#include <algorithm>
-#include <cstdlib>
-#include <ctime>
+#include <set>
+#include <unordered_map>
+#include <iostream>
 
 class CheeseBotAPI{
-    int depth;
-    int boardHeight;
-    int boardWidth;
-    std::vector<Move> moves;
+    std::vector<CheeseAPI> tree;
+    std::vector<int> edges, depth;
+    std::set<std::string> checked;
+    std::vector<double> weighs;
 
-    std::vector<Move> getCorrectMoves(std::vector<Move>& allMoves, std::vector<std::vector<Piece*>>& board, int posX, int posY){
-        std::vector<Move> out;
-        for(Move move : allMoves){
-            int mx = posX + move.dx;
-            int my = posY + move.dy;
-            if(board[mx][my] == nullptr or board[mx][my]->getColor() == board[posX][posY]->getColor())
-                continue;
-
-            out.push_back(Move(mx, my));
-        }
-        return out;
-    }
-
-    void getMoves(std::vector<std::vector<Piece*>>& board){
-        for(int y = 0; y<boardWidth; y++){
-            for(int x = 0; x<boardHeight; x++){
-                if(board[y][x] == nullptr) continue;
-                std::vector<Move> allMoves = board[y][x]->getMoves(x, y);
-                std::vector<Move> tmp = getCorrectMoves(allMoves, board, x, y);
-                std::copy(tmp.begin(), tmp.end(), std::back_inserter(moves));
+    void generateTree(CheeseAPI board, int cameFrom){
+        for(int i = 0; i<8; i++){
+            for(int j = 0; j<8; j++){
+                std::vector<Move> moves = board.getPieceAvailableMoves(i, j);
+                for(int k = 0; k<moves.size(); k++){
+                    try{
+                        std::cout<<k<<" : k\n";
+                        CheeseAPI tmp(board);
+                        std::cout<<tmp<<std::endl;
+                        std::cout<<"move 1 \n";
+                        tmp.movePiece(i, j, moves[k].dx, moves[k].dy);
+                        std::cout<<"move 2 \n";
+                        if(checked.find(tmp.toString()) != checked.end()) continue;
+                        std::cout<<"move3\n";
+                        checked.insert(tmp.toString());
+                        tree.push_back(tmp);
+                        depth.push_back(depth[cameFrom]+1);
+                        edges.push_back(cameFrom);
+                        std::cout<<depth.back()<<" : depth\n";
+                    }catch(std::invalid_argument a){
+                        std::cout<<i<<" "<<j<<" to "<<i+moves[k].dx<<" "<<j+moves[k].dy<<" "<<a.what()<<std::endl;
+                    }
+                }
             }
         }
     }
 
-    int chooseMove(){
-        int numberOfMoves = moves.size();
-        return rand() % numberOfMoves;
+    void resolveTree(){
+        std::vector<bool> done;
+        done.assign(tree.size(), 0);
+
+
     }
 
 public:
-    CheeseBotAPI(int _boardHeight = 8, int _boardWidth = 8, int _depth = 1): boardHeight(_boardHeight), boardWidth(_boardWidth), depth(_depth) {
-        srand(time(NULL));
+    void getMove(CheeseAPI board, int maxDepth = 2){
+        tree.push_back(board);
+        depth.push_back(0);
+        for(int i = 0; i<tree.size(); i++){
+            if(depth[i] == maxDepth) break;
+            generateTree(tree[i], i);
+            std::cout<<tree.size()<<" :siz"<<"\n";
+        }
     }
 
-    Move getMove(std::vector<std::vector<Piece*>> board){
-        getMoves(board);
-        Move out =  moves[chooseMove()];
-        moves.clear();
-        return out;
+    int getTreeSize(){
+        return tree.size();
     }
 };
