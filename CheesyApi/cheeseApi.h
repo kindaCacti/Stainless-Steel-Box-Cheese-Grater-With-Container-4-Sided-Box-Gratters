@@ -1,6 +1,5 @@
 #pragma once
 #include "pieces.h"
-#include <iostream>
 #include <string>
 
 class CheeseAPI {
@@ -20,6 +19,8 @@ public:
   std::vector<Move> getPieceAvailableMoves(int x, int y);
   Piece* movePiece(int x, int y, int dx, int dy);
   auto const getBoard() { return board; }
+  void setBoard(Piece* newPiece, int x, int y) { board[x][y] = newPiece; }
+  Piece* at(int x, int y) {return board[x][y];}
   std::string toString();
   void printMoves(int x, int y);
   std::string uniqueStamp();

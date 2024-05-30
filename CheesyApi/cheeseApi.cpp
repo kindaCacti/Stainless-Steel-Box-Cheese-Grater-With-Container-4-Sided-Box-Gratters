@@ -166,10 +166,10 @@ Piece* CheeseAPI::movePiece(int x, int y, int dx, int dy) {
   Piece* old = board[x+dx][y+dy];
   board[x+dx][y+dy] = board[x][y];
   board[x][y] = nullptr;
-  if(isKingInDanger(color))
-    board[x][y] = board[x+dx][y+dy];
-    board[x+dx][y+dy] = old;
-    throw std::invalid_argument("King in danger!");
+  //if(isKingInDanger(color))
+  //  board[x][y] = board[x+dx][y+dy];
+  //  board[x+dx][y+dy] = old;
+  //  throw std::invalid_argument("King in danger!");
   return old;
 }
 
