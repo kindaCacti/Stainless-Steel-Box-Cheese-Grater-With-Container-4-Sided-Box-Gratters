@@ -68,4 +68,8 @@ public:
         board[59] = pieces_names::black_queen;
         board[60] = pieces_names::black_king;
     }
+
+    std::vector<Move> getMovesOf(int x, int y){
+        
+    }
 };

@@ -22,6 +22,7 @@ public:
   auto const getBoard() { return board; }
   std::string toString();
   void printMoves(int x, int y);
+  std::string uniqueStamp();
 
   friend std::ostream& operator<<(std::ostream& os, CheeseAPI api);
 };

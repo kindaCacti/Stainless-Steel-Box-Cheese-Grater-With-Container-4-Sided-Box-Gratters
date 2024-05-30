@@ -189,6 +189,14 @@ std::string CheeseAPI::toString() {
   return result;
 }
 
+std::string CheeseAPI::uniqueStamp(){
+  std::string result = "";
+  for(int i = 0; i<8; i++)
+    for(int j = 0; j<8; j++)
+      result+=board[i][j]->uniqueStamp();
+  return result;
+}
+
 void CheeseAPI::printMoves(int x, int y) {
   std::string result = toString();
   std::vector<Move> moves = getPieceAvailableMoves(x, y);
