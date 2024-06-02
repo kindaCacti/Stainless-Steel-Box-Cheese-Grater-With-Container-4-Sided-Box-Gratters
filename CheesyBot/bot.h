@@ -1,10 +1,12 @@
 #pragma once
 #include "../CheesyApi/piece.h"
 #include "../CheesyApi/cheeseApi.h"
+#include "eval_tables.h"
 #include <vector>
 #include <set>
 #include <unordered_map>
 #include <iostream>
+
 
 class CheeseBotAPI{
     int color = 1;
