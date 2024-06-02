@@ -62,7 +62,7 @@ struct EVAL_TABLES{
                                 -10,  0,  0,  0,  0,  0,  0, -10 ,
                                 -30, 30, 40, 10, 10,  0,  0, -30 };
     
-    static int getVal(PIECE_NAME pn, PIECE_COLOR col, int x, int y){
+    static int evaluate(PIECE_NAME pn, PIECE_COLOR col, int x, int y){
         if(col == PIECE_COLOR::BLACK){
             y = 8 - y;
         }

@@ -6,6 +6,8 @@
 #include <set>
 #include <unordered_map>
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
 
 
 class CheeseBotAPI{
@@ -48,6 +50,21 @@ class CheeseBotAPI{
         }
     }
 
+    PIECE_NAME nameToEnum(std::string name){
+            if(name == "Rook")      return PIECE_NAME::ROOK;
+            if(name == "Knight")    return PIECE_NAME::KNIGHT;
+            if(name == "Bishop")    return PIECE_NAME::BISHOP;
+            if(name == "King")    return PIECE_NAME::KING;
+            if(name == "Queen")    return PIECE_NAME::QUEEN;
+        return PIECE_NAME::PAWN;
+    }
+
+    PIECE_COLOR colorToEnum(int color){
+        if(color == 0) return PIECE_COLOR::BLACK;
+        return PIECE_COLOR::WHITE;
+    }
+
+
     double evaluate(CheeseAPI& board){
         double out = 0;
         for(int i = 0; i<8; i++){
@@ -55,7 +72,13 @@ class CheeseBotAPI{
                 auto tmp = board.at(i, j);
                 if(tmp == nullptr) continue;
 
-                out += tmp->getWeight() * (color == tmp->getColor()? 1 : -1);
+                int strict_eval = EVAL_TABLES::evaluate(nameToEnum(tmp->getName()), colorToEnum(tmp->getColor()), i, j);
+
+                double scalar = 1.0;
+                out += (double)strict_eval * scalar; // we multiply things by a random scalar just to make things fun.
+
+
+                //out += tmp->getWeight() * (color == tmp->getColor()? 1 : -1);
             }
         }
 
@@ -63,6 +86,7 @@ class CheeseBotAPI{
     }
 
     void resolveTree(){
+        srand(time(NULL));
         eval.assign(tree.size(), {{}, -1});
         std::vector<bool> done;
         done.assign(tree.size(), 0);
@@ -86,6 +110,8 @@ class CheeseBotAPI{
     }
 
 public:
+    CheeseBotAPI() = default;
+
     Move getMove(CheeseAPI board, int maxDepth = 2){
         tree.push_back({board, {}});
         depth.push_back(0);
