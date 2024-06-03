@@ -15,6 +15,10 @@ public:
         }
     }
 
+    Piece* getBoard(){
+        return board;
+    }
+
     void setPieces(){
         int resolve = 0;
 

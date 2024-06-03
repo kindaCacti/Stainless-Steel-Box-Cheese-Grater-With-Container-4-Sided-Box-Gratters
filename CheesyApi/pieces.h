@@ -134,3 +134,20 @@ Move translateMoves(MOVES mov){
     }
     return {0, 0};
 }
+
+int pieceValues(PIECE_NAMES pn){
+    switch(pn){
+        case PIECE_NAMES::PAWN:
+            return 1;
+        case PIECE_NAMES::BISHOP:
+        case PIECE_NAMES::KNIGHT:
+            return 3;
+        case PIECE_NAMES::ROOK:
+            return 5;
+        case PIECE_NAMES::QUEEN:
+            return 7;
+        case PIECE_NAMES::KING:
+            return 2137;
+    }
+    return 0;
+}

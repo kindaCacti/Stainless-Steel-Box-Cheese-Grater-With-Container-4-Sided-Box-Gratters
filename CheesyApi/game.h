@@ -138,6 +138,10 @@ public:
 
         return !ongoing;
     }
+
+    Board& getBoard(){
+        return gameBoard;
+    }
 };
 
 std::ostream& operator<<(std::ostream& os, const Game game){
