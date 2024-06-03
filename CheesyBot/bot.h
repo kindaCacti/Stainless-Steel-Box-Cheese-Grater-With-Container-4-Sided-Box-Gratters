@@ -1,138 +1,76 @@
 #pragma once
-#include "../CheesyApi/piece.h"
-#include "../CheesyApi/cheeseApi.h"
-#include "eval_tables.h"
+#include "../CheesyApi/board.h"
 #include <vector>
-#include <set>
-#include <unordered_map>
-#include <iostream>
-#include <cstdlib>
-#include <ctime>
 
+class Bot{
 
-class CheeseBotAPI{
-    int color = 1;
-    std::vector<std::pair<CheeseAPI, Move>> tree;
-    std::vector<int> edges, depth;
-    std::set<std::string> checked;
-    std::vector<double> weighs;
-    std::vector<std::pair<double, int>> eval;
+    struct MovePackage{
+        int fx, fy;
+        Move mv;
+    };
 
-    void copyBoard(CheeseAPI& from, CheeseAPI& to){
-        for(int i = 0; i<8; i++){
-            for(int j = 0; j<8; j++){
-                if(from.at(i, j) == nullptr) continue;
+    std::vector<Piece*> tree;
+    std::vector<double> score;
+    std::vector<int> depth, parent;
+    std::vector<MovePackage> toHere; 
 
-                to.setBoard(new Piece(*from.at(i, j)), i, j);
+public:
+    Bot() = default;
+    Bot(Board& board){
+        tree.push_back(board.getBoard());
+        depth.push_back(0);
+        parent.push_back(-1);
+        toHere.push_back({0,0,{0,0}});
+    }
+
+    void addBranches(int round, Piece* pieces, int from){
+        Board board(pieces);
+
+        PIECE_COLOR currentColor = (round%2) ? PIECE_COLOR::WHITE : PIECE_COLOR::BLACK;
+
+        for(int i = 0; i<64; i++){
+            int x = i%8;
+            int y = i/8;
+
+            if(board.at(i).name == PIECE_NAMES::NO_PIECE) continue;
+            if(board.at(i).color != currentColor) continue;
+
+            std::vector<Move> moves = board.getMoves(x, y);
+
+            for(Move mv : moves){
+                depth.push_back(depth[from] + 1);
+                parent.push_back(from);
+                Board tmp(pieces);
+                tmp.makeMove(x, y, mv);
+                tree.push_back(tmp.getBoard());
             }
         }
     }
 
-    void generateTree(CheeseAPI board, int cameFrom){
-        for(int i = 0; i<8; i++){
-            for(int j = 0; j<8; j++){
-                std::vector<Move> moves = board.getPieceAvailableMoves(i, j);
-                for(int k = 0; k<moves.size(); k++){
-                    try{
-                        CheeseAPI tmp(board);
-                        copyBoard(board, tmp);
-                        tmp.movePiece(i, j, moves[k].dx, moves[k].dy);
-                        if(checked.find(tmp.toString()) != checked.end()) continue;
-                        checked.insert(tmp.toString());
-                        tree.push_back({tmp, Move(moves[k])});
-                        depth.push_back(depth[cameFrom]+1);
-                        edges.push_back(cameFrom);
-                    }catch(std::invalid_argument a){
-                        std::cout<<i<<" "<<j<<" to "<<i+moves[k].dx<<" "<<j+moves[k].dy<<" "<<a.what()<<std::endl;
-                    }
-                }
-            }
+    void fillTree(int round, int maxDepth = 2){
+        for(int i = 0; i<tree.size(); i++){
+            if(depth[i] == maxDepth) break;
+            addBranches(round + depth[i], tree[i]);
         }
     }
 
-    PIECE_NAME nameToEnum(std::string name){
-            if(name == "Rook")      return PIECE_NAME::ROOK;
-            if(name == "Knight")    return PIECE_NAME::KNIGHT;
-            if(name == "Bishop")    return PIECE_NAME::BISHOP;
-            if(name == "King")    return PIECE_NAME::KING;
-            if(name == "Queen")    return PIECE_NAME::QUEEN;
-        return PIECE_NAME::PAWN;
-    }
+    int evalutateBranch(int branchIndex){
+        int out = 0;
+        for(int i = 0; i<64; i++){
+            int tmp = pieceValues(tree[branchIndex][i].name);
+            if(!depth[branchIndex]%2) tmp *= -1;
 
-    PIECE_COLOR colorToEnum(int color){
-        if(color == 0) return PIECE_COLOR::BLACK;
-        return PIECE_COLOR::WHITE;
-    }
-
-
-    double evaluate(CheeseAPI& board){
-        double out = 0;
-        for(int i = 0; i<8; i++){
-            for(int j = 0; j<8; j++){
-                auto tmp = board.at(i, j);
-                if(tmp == nullptr) continue;
-
-                int strict_eval = EVAL_TABLES::evaluate(nameToEnum(tmp->getName()), colorToEnum(tmp->getColor()), i, j);
-
-                double scalar = 1.0;
-                out += (double)strict_eval * scalar; // we multiply things by a random scalar just to make things fun.
-
-
-                //out += tmp->getWeight() * (color == tmp->getColor()? 1 : -1);
-            }
+            out += tmp; 
         }
 
         return out;
     }
 
-    void resolveTree(){
-        srand(time(NULL));
-        eval.assign(tree.size(), {{}, -1});
-        std::vector<bool> done;
-        done.assign(tree.size(), 0);
+    void evaluateTree(){
+        score.assign(tree.size(), 0);
 
-        for(int i = tree.size() - 1; i>0; i--){
-            double tmp = evaluate(tree[i].first);
-            int prev = edges[i];
-            if(depth[i] % 2){
-                if(eval[prev].first < tmp or !done[prev]){
-                    eval[prev] = {tmp, i};
-                    done[prev] = true;
-                }
-                continue;
-            }
-
-            if(eval[prev].first > tmp or !done[prev]){
-                eval[prev] = {tmp, i};
-                done[prev] = true;
-            }
+        for(int i = 1; i<tree.size(); i++){
+            score[i] = evalutateBranch(tree[i]);
         }
-    }
-
-public:
-    CheeseBotAPI() = default;
-
-    Move getMove(CheeseAPI board, int maxDepth = 2){
-        tree.push_back({board, {}});
-        depth.push_back(0);
-        for(int i = 0; i<tree.size(); i++){
-            if(depth[i] == maxDepth) break;
-            generateTree(tree[i].first, i);
-        }
-
-        resolveTree();
-        return tree[0].second;
-    }
-
-    void showResolvedTree(){
-        int cpos = 0;
-        while(eval[cpos].second != -1){
-            cpos = eval[cpos].second;
-            std::cout<<tree[cpos].second<<std::endl;
-        }
-    }
-
-    int getTreeSize(){
-        return tree.size();
     }
 };
