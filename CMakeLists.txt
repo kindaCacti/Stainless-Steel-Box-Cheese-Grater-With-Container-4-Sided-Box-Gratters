@@ -16,10 +16,10 @@ set(API_FOLDER CheesyApi)
 set(BOT_FOLDER CheesyBot)
 set(APP_FOLDER CheesyApp)
 set(API_SOURCES
-   ${API_FOLDER}/piece.h
-   ${API_FOLDER}/pieces.h
-   ${API_FOLDER}/cheeseApi.h
-   ${API_FOLDER}/cheeseApi.cpp
+   ${API_FOLDER}/board.h
+   # ${API_FOLDER}/board.h
+   ${API_FOLDER}/game.h
+   ${API_FOLDER}/pieces.cpp
 )
 set(BOT_SOURCES
    ${BOT_FOLDER}/bot.h
