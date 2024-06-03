@@ -15,6 +15,7 @@ FetchContent_MakeAvailable(googletest)
 set(API_FOLDER CheesyApi)
 set(BOT_FOLDER CheesyBot)
 set(APP_FOLDER CheesyApp)
+set(THIRD_PARTY_FOLDER ThirdParty)
 set(API_SOURCES
    ${API_FOLDER}/piece.h
    ${API_FOLDER}/pieces.h
@@ -26,15 +27,32 @@ set(BOT_SOURCES
 )
 set(APP_SOURCES
    ${APP_FOLDER}/app.h
+   ${APP_FOLDER}/renderer.h
+   ${APP_FOLDER}/renderer.cpp
+   ${APP_FOLDER}/texture.h
+   ${APP_FOLDER}/texture.cpp
+)
+set(THIRD_PARTY_SOURCES
+   ${THIRD_PARTY_FOLDER}/stb_image.h
+   ${THIRD_PARTY_FOLDER}/glad.h
+   ${THIRD_PARTY_FOLDER}/khrplatform.h
+   ${THIRD_PARTY_FOLDER}/glad.c
 )
 
-set(PROJECT_SOURCES ${API_SOURCES} ${BOT_SOURCES} ${APP_SOURCES})
+set(PROJECT_SOURCES
+   ${API_SOURCES}
+   ${BOT_SOURCES}
+   ${APP_SOURCES}
+   ${THIRD_PARTY_SOURCES}
+)
 
 add_executable(demo main.cpp ${PROJECT_SOURCES} )
 add_executable(app ${APP_FOLDER}/main.cpp ${PROJECT_SOURCES} )
 
 find_package(glfw3 REQUIRED)
-target_link_libraries(demo glfw)
-target_link_libraries(app glfw)
+set(PROJECT_LIBARIES glfw3.lib opengl32.lib glew32.lib)
+
+target_link_libraries(demo ${PROJECT_LIBARIES})
+target_link_libraries(app ${PROJECT_LIBARIES})
 # add_executable(testGoogle testGoogle.cpp ${PROJECT_SOURCES})
 # target_link_libraries(testGoogle PUBLIC gtest_main)
