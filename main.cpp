@@ -15,13 +15,13 @@ int main(){
                 std::cin>>movX>>movY;
             }while(!game.choosePiece(movX, movY, std::cout));
 
+            std::cout<<"possible moves are (write 'o' to change a piece): "<<std::endl;
             game.showPossibleMoves(std::cout);
 
             char ex, ey;
             std::cin>>ex;
 
             if(ex == 'o') continue;
-            if(ex=='q') return 0;
 
             std::cin>>ey;
 
