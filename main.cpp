@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "./chess_API/game.h"
+#include "./CheesyApi/game.h"
 
 int main(){
     Game game;
