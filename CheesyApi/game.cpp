@@ -33,7 +33,8 @@ int Game::translateToMoveIndex(char movX, char movY) {
 bool Game::choosePiece(char movX, char movY, std::ostream &os) {
     possibleMoves.clear();
     int index = translateToMoveIndex(movX, movY);
-
+    selectedPieceIndex = index;
+    
     if (index == -1) {
         os << "Position does not exist!!" << std::endl;
         return false;
@@ -57,6 +58,7 @@ bool Game::choosePiece(char movX, char movY) {
     possibleMoves.clear();
     int index = translateToMoveIndex(movX, movY);
 
+    selectedPieceIndex = index;
     if (index == -1) return false;
     if (gameBoard.at(index).name == PIECE_NAMES::NO_PIECE) return false;
     if (gameBoard.at(index).color != turn) return false;
