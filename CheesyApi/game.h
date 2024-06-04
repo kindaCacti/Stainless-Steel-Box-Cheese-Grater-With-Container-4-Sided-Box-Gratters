@@ -24,8 +24,11 @@ public:
   }
   int translateToMoveIndex(char, char);
   bool choosePiece(char, char, std::ostream&);
+  bool choosePiece(char, char);
+  bool movePiece(std::string, std::string);
   std::string translateToChessCoordinates(Move);
   void showPossibleMoves(std::ostream&);
+  void showPossibleMoves();
   void nextTurn();
   bool makeMove(char, char);
   bool isEnd(std::ostream&);
