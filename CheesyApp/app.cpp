@@ -1,20 +1,105 @@
-#include "imageRect.h"
-#include "indexBuffer.h"
-#include "renderer.h"
-#include "shader.h"
-#include "texture.h"
-#include "vertexArray.h"
-#include "vertexBuffer.h"
-#include "vertexBufferLayout.h"
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <iostream>
-#include <string>
+#include "app.h"
+#include <stdexcept>
 
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
+App::App() {
+  if (initWindow(800, 800, "Say Cheeseee") == -1) {
+    throw "Failed to initialize the app!";
+  }
+  ImageRect::initializeImageRects();
+  initializeBoard();
 
-int init(GLFWwindow *&window, int width, int height, const char *title) {
+  mainLoop();
+}
+
+void App::initializeBoard() {
+  pieceElements.push_back(new AppElement<ImageRect>(
+      new ImageRect("res/textures/board.png", 800, 800), false, true,
+      marginLeft, 0));
+
+  int pawnRows[2] = {1, 6};
+  int figureRows[2] = {0, 7};
+  for (int c = 0; c < 2; ++c) {
+    std::string color(c == 0 ? "white" : "black");
+    std::string path = std::string("res/textures/") + color;
+    for (int x = 0; x < 8; ++x) {
+      pieceElements.push_back(new AppElement<ImageRect>(
+          new ImageRect(path + std::string("/Pawn.png"), 100, 100), false, true,
+          marginLeft + 100 * x, pawnRows[c] * 100));
+    }
+    pieceElements.push_back(new AppElement<ImageRect>(
+        new ImageRect(path + std::string("/Rook.png"), 100, 100), false, true,
+        marginLeft, figureRows[c] * 100));
+    pieceElements.push_back(new AppElement<ImageRect>(
+        new ImageRect(path + std::string("/Rook.png"), 100, 100), false, true,
+        marginLeft + 700, figureRows[c] * 100));
+    pieceElements.push_back(new AppElement<ImageRect>(
+        new ImageRect(path + std::string("/Knight.png"), 100, 100), false, true,
+        marginLeft + 100, figureRows[c] * 100));
+    pieceElements.push_back(new AppElement<ImageRect>(
+        new ImageRect(path + std::string("/Knight.png"), 100, 100), false, true,
+        marginLeft + 600, figureRows[c] * 100));
+    pieceElements.push_back(new AppElement<ImageRect>(
+        new ImageRect(path + std::string("/Bishop.png"), 100, 100), false, true,
+        marginLeft + 200, figureRows[c] * 100));
+    pieceElements.push_back(new AppElement<ImageRect>(
+        new ImageRect(path + std::string("/Bishop.png"), 100, 100), false, true,
+        marginLeft + 500, figureRows[c] * 100));
+    pieceElements.push_back(new AppElement<ImageRect>(
+        new ImageRect(path + std::string("/Queen.png"), 100, 100), false, true,
+        marginLeft + 300, figureRows[c] * 100));
+    pieceElements.push_back(new AppElement<ImageRect>(
+        new ImageRect(path + std::string("/King.png"), 100, 100), false, true,
+        marginLeft + 400, figureRows[c] * 100));
+  }
+}
+
+Position App::notationToPosition(char x, char y) const {
+  return Position(int(x - 'a') * 100, int(y - '1') * 100);
+}
+
+void App::tick(double delta) {
+  // for (auto element : staticElements) {
+  //   element->tick(delta);
+  // }
+  // for (auto element : highlightElements) {
+  //   element->tick(delta);
+  // }
+  for (auto element : pieceElements) {
+    element->tick(delta);
+  }
+}
+
+void App::draw() {
+  // for (auto element : staticElements) {
+  //   element->draw();
+  // }
+  // for (auto element : highlightElements) {
+  //   element->draw();
+  // }
+  for (auto element : pieceElements) {
+    element->draw();
+  }
+}
+
+void App::mainLoop() {
+  Renderer renderer;
+  double lastTime = glfwGetTime();
+  while (!glfwWindowShouldClose(window)) {
+    double now = glfwGetTime();
+    double delta = now - lastTime;
+    lastTime = now;
+
+    renderer.clear();
+
+    tick(delta);
+    draw();
+
+    glfwSwapBuffers(window);
+    glfwPollEvents();
+  }
+}
+
+int App::initWindow(int width, int height, const char *title) {
   if (!glfwInit()) {
     std::cout << "Failed to initialize GLFW" << std::endl;
     return -1;
@@ -45,22 +130,19 @@ int init(GLFWwindow *&window, int width, int height, const char *title) {
   return 0;
 }
 
-int main() {
-  GLFWwindow *window;
-  if (init(window, 1100, 800, "Say Cheeseee") == -1)
-    return -1;
-  {
-    ImageRect::initializeImageRects();
-    ImageRect boardImg("res/textures/board.png");
-    Renderer renderer;
-    while (!glfwWindowShouldClose(window)) {
-      renderer.clear();
-      boardImg.draw(10, 10);
-      glfwSwapBuffers(window);
-      glfwPollEvents();
-    }
-    ImageRect::deinitializeImageRects();
+App::~App() {
+  // for (auto element : staticElements) {
+  //   delete element;
+  // }
+  // staticElements.clear();
+  // for (auto element : highlightElements) {
+  //   delete element;
+  // }
+  // highlightElements.clear();
+  for (auto element : pieceElements) {
+    delete element;
   }
+  pieceElements.clear();
+  ImageRect::deinitializeImageRects();
   glfwTerminate();
-  return 0;
 }

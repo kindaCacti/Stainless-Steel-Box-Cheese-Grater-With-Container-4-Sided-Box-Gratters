@@ -48,7 +48,9 @@ set(ENGINE_SOURCES
    ${ENGINE_FOLDER}/imageRect.cpp
 )
 set(APP_SOURCES
-   ${BOT_FOLDER}/bot.h
+   ${APP_FOLDER}/appElement.h
+   ${APP_FOLDER}/app.h
+   ${APP_FOLDER}/app.cpp
 )
 set(THIRD_PARTY_SOURCES
    ${THIRD_PARTY_FOLDER}/stb_image/stb_image.h
@@ -63,15 +65,15 @@ ${APP_SOURCES}
 ${THIRD_PARTY_SOURCES}
 )
 
-include_directories(${THIRD_PARTY_FOLDER} ${ENGINE_FOLDER})
+include_directories(${THIRD_PARTY_FOLDER} ${ENGINE_FOLDER} ${API_FOLDER})
 
-add_executable(demo main.cpp ${PROJECT_SOURCES} )
-add_executable(app ${APP_FOLDER}/app.cpp ${PROJECT_SOURCES} )
+# add_executable(demo main.cpp ${PROJECT_SOURCES} )
+add_executable(app ${APP_FOLDER}/main.cpp ${PROJECT_SOURCES} )
 
 find_package(glfw3 REQUIRED)
 set(PROJECT_LIBARIES glfw3.lib opengl32.lib glew32.lib)
 
-target_link_libraries(demo ${PROJECT_LIBARIES})
+# target_link_libraries(demo ${PROJECT_LIBARIES})
 target_link_libraries(app ${PROJECT_LIBARIES})
 # add_executable(testGoogle testGoogle.cpp ${PROJECT_SOURCES})
 # target_link_libraries(testGoogle PUBLIC gtest_main)

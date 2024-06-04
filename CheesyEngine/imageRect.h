@@ -25,10 +25,12 @@ public:
   static Shader *shader;
   static Renderer *renderer;
 
-  ImageRect(const std::string &filepath);
+  ImageRect(const std::string &filepath, unsigned int width = 0,
+            unsigned int height = 0);
   ~ImageRect();
 
   void draw(int x, int y);
+  void tick(double delta) {}
 
 private:
   GLFWvidmode getWindowSize();

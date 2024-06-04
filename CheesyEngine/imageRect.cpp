@@ -27,20 +27,24 @@ void ImageRect::deinitializeImageRects() {
   delete ImageRect::shader;
 }
 
-ImageRect::ImageRect(const std::string &filepath) : texture(filepath) {
+ImageRect::ImageRect(const std::string &filepath, unsigned int width,
+                     unsigned int height)
+    : texture(filepath), mWidth(width), mHeight(height) {
   if (!renderer || !indexBuffer || !shader) {
     std::cout << "Required static variables of ImageRect not initialized! Use "
                  "'ImageRect::initializeImageRects()' to do so."
               << std::endl;
   }
   // Calculating vertices
-  float width = (float)texture.getWidth();
-  float height = (float)texture.getHeight();
+  if (width == 0)
+    mWidth = texture.getWidth();
+  if (height == 0)
+    mHeight = texture.getHeight();
   float positions[] = {
-      0.0f,  0.0f,   0.0f, 0.0f, // bottom left
-      width, 0.0f,   1.0f, 0.0f, // bottom right
-      width, height, 1.0f, 1.0f, // top right
-      0.0f,  height, 0.0f, 1.0f  // top left
+      0.0f,          0.0f,           0.0f, 0.0f, // bottom left
+      (float)mWidth, 0.0f,           1.0f, 0.0f, // bottom right
+      (float)mWidth, (float)mHeight, 1.0f, 1.0f, // top right
+      0.0f,          (float)mHeight, 0.0f, 1.0f  // top left
   };
 
   // Loading vertices
@@ -74,6 +78,8 @@ void ImageRect::draw(int x, int y) {
   glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0));
   shader->bind();
   shader->setUniformMat4f("uMVP", projectionMatrix * trans);
+  texture.bind();
+  shader->setUniform1i("uTexture", 0);
   shader->unbind();
   renderer->draw(vertexArray, *indexBuffer, *shader);
 }
