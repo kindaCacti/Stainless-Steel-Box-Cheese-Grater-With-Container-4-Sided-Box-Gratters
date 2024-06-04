@@ -195,6 +195,24 @@ std::vector<Move> Board::getMoves(int x, int y, bool check){
                 }
             }
         }
+
+        if(at(x, y).moves_done == 0){
+            Move mv = {0,1};
+            if(at(x, y).color == PIECE_COLOR::WHITE) reverseMove(mv);
+            if(at(x, y + mv.delta_y).name == PIECE_NAMES::NO_PIECE){
+                if(at(x, y + mv.delta_y*2).name == PIECE_NAMES::NO_PIECE){
+                    Board nextBoard(this->board);
+                    int ex = x;
+                    int ey = y + mv.delta_y * 2;
+                    nextBoard.makeMove(ex, ey, sm);
+
+                    out.push_back(mv*2);
+                    if(check and nextBoard.isKingUnderAttack(at(x, y).color)){
+                        out.pop_back();
+                    }
+                }
+            }
+        }
     }
 
     return out;
@@ -241,12 +259,14 @@ void Board::promote(){
         if(at(i, 0).name == PIECE_NAMES::PAWN){
             Piece tmp = at(i, 0);
             tmp.name = PIECE_NAMES::QUEEN;
+            tmp.moves_done = -1;
             setAt(i, 0, tmp);
         }
 
         if(at(i, 7).name == PIECE_NAMES::PAWN){
             Piece tmp = at(i, 7);
             tmp.name = PIECE_NAMES::QUEEN;
+            tmp.moves_done = -1;
             setAt(i, 7, tmp);
         }
     }
