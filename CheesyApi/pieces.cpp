@@ -34,27 +34,25 @@ char pieceChar(Piece tp) {
 
 MovePossibilities getBaseMoves(PIECE_NAMES pn, int moves_done = 0) {
   switch (pn) {
-  case PIECE_NAMES::PAWN:
-    if (moves_done == 0)
-      return {{}, {MOVES::UP, MOVES::PAWN_MOVES}};
-    return {{}, {MOVES::UP}};
-  case PIECE_NAMES::BISHOP:
-    return {{MOVES::UL_DIAG, MOVES::UR_DIAG, MOVES::DL_DIAG, MOVES::DR_DIAG},
-            {}};
-  case PIECE_NAMES::ROOK:
-    return {{MOVES::UP, MOVES::DOWN, MOVES::LEFT, MOVES::RIGHT}, {}};
-  case PIECE_NAMES::KNIGHT:
-    return {{},
-            {MOVES::LSHAPE1, MOVES::LSHAPE2, MOVES::LSHAPE3, MOVES::LSHAPE4,
-             MOVES::LSHAPE5, MOVES::LSHAPE6, MOVES::LSHAPE7, MOVES::LSHAPE8}};
-  case PIECE_NAMES::QUEEN:
-    return {{MOVES::UP, MOVES::DOWN, MOVES::LEFT, MOVES::RIGHT, MOVES::UL_DIAG,
-             MOVES::UR_DIAG, MOVES::DL_DIAG, MOVES::DR_DIAG},
-            {}};
-  case PIECE_NAMES::KING:
-    return {{},
-            {MOVES::UP, MOVES::DOWN, MOVES::LEFT, MOVES::RIGHT, MOVES::UL_DIAG,
-             MOVES::UR_DIAG, MOVES::DL_DIAG, MOVES::DR_DIAG, MOVES::CASTLE}};
+    case PIECE_NAMES::PAWN:
+      return {{}, {MOVES::UP}};
+    case PIECE_NAMES::BISHOP:
+      return {{MOVES::UL_DIAG, MOVES::UR_DIAG, MOVES::DL_DIAG, MOVES::DR_DIAG},
+              {}};
+    case PIECE_NAMES::ROOK:
+      return {{MOVES::UP, MOVES::DOWN, MOVES::LEFT, MOVES::RIGHT}, {}};
+    case PIECE_NAMES::KNIGHT:
+      return {{},
+              {MOVES::LSHAPE1, MOVES::LSHAPE2, MOVES::LSHAPE3, MOVES::LSHAPE4,
+              MOVES::LSHAPE5, MOVES::LSHAPE6, MOVES::LSHAPE7, MOVES::LSHAPE8}};
+    case PIECE_NAMES::QUEEN:
+      return {{MOVES::UP, MOVES::DOWN, MOVES::LEFT, MOVES::RIGHT, MOVES::UL_DIAG,
+              MOVES::UR_DIAG, MOVES::DL_DIAG, MOVES::DR_DIAG},
+              {}};
+    case PIECE_NAMES::KING:
+      return {{},
+              {MOVES::UP, MOVES::DOWN, MOVES::LEFT, MOVES::RIGHT, MOVES::UL_DIAG,
+              MOVES::UR_DIAG, MOVES::DL_DIAG, MOVES::DR_DIAG, MOVES::CASTLE}};
   }
   return {{}, {}};
 }
