@@ -35,4 +35,5 @@ public:
   bool isEnd(std::ostream&);
   Board &getBoard() { return gameBoard; }
   friend std::ostream &operator<<(std::ostream &os, const Game game) { return os << game.showGame(); }
+  Move& revInY(Move& a) { a.delta_y *= -1; return a; }
 };
