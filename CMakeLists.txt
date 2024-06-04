@@ -18,7 +18,6 @@ set(APP_FOLDER CheesyApp)
 set(THIRD_PARTY_FOLDER ThirdParty)
 set(API_SOURCES
    ${API_FOLDER}/board.h
-   # ${API_FOLDER}/board.h
    ${API_FOLDER}/game.h
    ${API_FOLDER}/pieces.h
 )
@@ -26,7 +25,6 @@ set(BOT_SOURCES
    ${BOT_FOLDER}/bot.h
 )
 set(APP_SOURCES
-   ${APP_FOLDER}/app.h
    ${APP_FOLDER}/renderer.h
    ${APP_FOLDER}/renderer.cpp
    ${APP_FOLDER}/vertexBuffer.h
@@ -37,14 +35,14 @@ set(APP_SOURCES
    ${APP_FOLDER}/vertexBufferLayout.cpp
    ${APP_FOLDER}/vertexArray.h
    ${APP_FOLDER}/vertexArray.cpp
+   ${APP_FOLDER}/shader.h
+   ${APP_FOLDER}/shader.cpp
    ${APP_FOLDER}/texture.h
    ${APP_FOLDER}/texture.cpp
 )
 set(THIRD_PARTY_SOURCES
    ${THIRD_PARTY_FOLDER}/stb_image.h
-   ${THIRD_PARTY_FOLDER}/glad.h
-   ${THIRD_PARTY_FOLDER}/khrplatform.h
-   ${THIRD_PARTY_FOLDER}/glad.c
+   ${THIRD_PARTY_FOLDER}/stb_image.cpp
 )
 
 set(PROJECT_SOURCES

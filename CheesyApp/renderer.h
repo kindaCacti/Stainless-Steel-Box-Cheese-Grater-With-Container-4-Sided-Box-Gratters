@@ -1,4 +1,7 @@
 #pragma once
+#include "indexBuffer.h"
+#include "shader.h"
+#include "vertexArray.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -14,14 +17,14 @@
 void glClearError();
 bool glLogCall(const char *function, const char *file, int line);
 
+#include <GL/glew.h>
 
-// #include <GL/glew.h>
+#define ASSERT(x)
 
-// #define ASSERT(x)
+class Renderer {
 
-// class Renderer {
-
-// public:
-//   void Draw(const VertexArray &va, const IndexBuffer &ib,
-//             const Shader &shader) const;
-// };
+public:
+  void clear();
+  void draw(const VertexArray &va, const IndexBuffer &ib,
+            const Shader &shader) const;
+};
