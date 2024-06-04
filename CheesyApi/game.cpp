@@ -94,7 +94,7 @@ void Game::showPossibleMoves(std::ostream &os) {
     }
 }
 
-void Game::showPossibleMoves() {
+void Game::loadPossibleMoves() {
     possibleMoves.clear();
     int movX = selectedPieceIndex % 8;
     int movY = selectedPieceIndex / 8;
@@ -154,7 +154,7 @@ bool Game::isEnd(std::ostream &os) {
 
 bool Game::movePiece(std::string from, std::string to){
     if(!choosePiece(from[0], from[1])) return false;
-    showPossibleMoves();
+    loadPossibleMoves();
     if(!makeMove(to[0], to[1])) return false;
     return true;
 }
