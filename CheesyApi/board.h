@@ -152,6 +152,7 @@ public:
     }
 
     std::vector<Move> getMoves(int x, int y, bool check = true){
+        //std::cout<<"getMovesstart\n";
         int index = y*8 + x;
         if(board[index].name == PIECE_NAMES::NO_PIECE) return {};
 
@@ -172,41 +173,55 @@ public:
             std::copy(tmp.begin(), tmp.end(), std::back_inserter(out));
         }
 
+        //std::cout<<toString()<<std::endl;
+
+        //std::cout<<"hihi\n"<<x<<" "<<y<<" "<<check<<std::endl;
+
         if(at(x, y).name == PIECE_NAMES::PAWN){
             Move sm = {1,1};
             if(at(x, y).color == PIECE_COLOR::WHITE) reverseMove(sm);
             int ex = x + sm.delta_x;
             int ey = y + sm.delta_y;
+            //std::cout<<ex<<" :ex2 2ey:"<<ey<<std::endl;
             if(ex >= 0 and ey >= 0 and ey < 8 and ex < 8){
+                //std::cout<<ex<<" :ex1 1ey:"<<ey<<std::endl;
                 if(at(ex, ey).name != PIECE_NAMES::NO_PIECE){
                     if(at(ex, ey).color != at(x, y).color){
                         Board nextBoard(this->board);
+                        //std::cout<<ex<<" :ex ey:"<<ey<<std::endl;
                         nextBoard.makeMove(ex, ey, sm);
+                        out.push_back(sm);
 
-                        if(!nextBoard.isKingUnderAttack(at(x, y).color, false)){
-                            out.push_back(sm);
+                        if(check and nextBoard.isKingUnderAttack(at(x, y).color)){
+                            out.pop_back();
                         }
                     }
                 }
             }
+
+            //std::cout<<"hi2\n";
 
             sm = {-1,1};
             if(at(x, y).color == PIECE_COLOR::WHITE) reverseMove(sm);
             ex = x + sm.delta_x;
             ey = y + sm.delta_y;
+            //std::cout<<ex<<" :ex3 3ey:"<<ey<<std::endl;
             if(ex >= 0 and ey >= 0 and ey < 8 and ex < 8){
                 if(at(ex, ey).name != PIECE_NAMES::NO_PIECE){
                     if(at(ex, ey).color != at(x, y).color){
                         Board nextBoard(this->board);
                         nextBoard.makeMove(ex, ey, sm);
 
-                        if(!nextBoard.isKingUnderAttack(at(x, y).color, false)){
-                            out.push_back(sm);
+                        out.push_back(sm);
+                        if(check and nextBoard.isKingUnderAttack(at(x, y).color)){
+                            out.pop_back();
                         }
                     }
                 }
             }
         }
+
+        //std::cout<<"getmovesend\n";
 
         return out;
     }

@@ -49,10 +49,16 @@ public:
     }
 
     bool choosePiece(char movX, char movY, std::ostream& os){
+        possibleMoves.clear();
         int index = translateToMoveIndex(movX, movY);
 
         if(index == -1){
             os<<"Position does not exist!!"<<std::endl;
+            return false;
+        }
+
+        if(gameBoard.at(index).name == PIECE_NAMES::NO_PIECE){
+            os<<"no piece at given position"<<std::endl;
             return false;
         }
 
@@ -106,6 +112,7 @@ public:
         int endingIndex = translateToMoveIndex(x, y);
         int ex = endingIndex%8;
         int ey = endingIndex/8;
+
         Move mv = {ex-sx, ey-sy};
 
         for(int i = 0; i<possibleMoves.size(); i++){
