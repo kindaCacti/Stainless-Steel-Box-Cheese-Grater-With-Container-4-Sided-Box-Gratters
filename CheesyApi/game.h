@@ -20,6 +20,7 @@ public:
     }
 
     int getRound() { return round; }
+    PIECE_COLOR turnOf() { return turn; }
 
     std::string showGame() const{
         std::string out = "Round number: " + std::to_string(round);
