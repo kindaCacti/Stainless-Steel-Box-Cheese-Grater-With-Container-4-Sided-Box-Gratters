@@ -20,16 +20,16 @@ struct Position {
 
 class App {
 public:
-  static std::vector<AppElementInterface *> staticElements;
-  static std::vector<AppElementInterface *> pieceElements;
+  static AppElementInterface *boardElement;
   static std::vector<AppElementInterface *> highlightElements;
+  static std::vector<AppElementInterface *> pieceElements;
   static AppElementInterface *currentElement;
   static Position mousePos;
+  static Game api;
 
 private:
   GLFWwindow *window;
   int marginLeft = 0;
-  Game api;
 
 public:
   App();
