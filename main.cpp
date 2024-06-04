@@ -37,7 +37,7 @@ int main(){
             std::cout<<"Bots best move is: ";
             Bot b(game.getBoard());
             
-            std::vector<int> bestMove = b.getBestMove(game.getRound());
+            std::vector<int> bestMove = b.getRandomMove(game.getRound());
 
             std::string bmove = b.convertToChessNotation(bestMove[0], bestMove[1]);
             bmove += b.convertToChessNotation(bestMove[2], bestMove[3]);
