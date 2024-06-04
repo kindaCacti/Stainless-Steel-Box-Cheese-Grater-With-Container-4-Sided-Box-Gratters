@@ -11,7 +11,7 @@ public:
     Board() = default;
     Board(Piece* _board){
         for(int i = 0; i<64; i++){
-            board[i] = {_board[i].name, _board[i].color};
+            board[i] = Piece(_board[i].name, _board[i].color, _board[i].moves_done);
         }
     }
 
@@ -24,7 +24,7 @@ public:
 
         for(int i = 0; i<8; i++){
             for(int j = 0; j<8; j++){
-                board[resolve] = {PIECE_NAMES::NO_PIECE};
+                board[resolve] = Piece(PIECE_NAMES::NO_PIECE);
                 resolve++;
             }
         }
@@ -100,8 +100,10 @@ public:
                 continue;
             }
 
-            if(at(nx, ny).color != at(fx, fy).color and at(fx, fy).name != PIECE_NAMES::PAWN) out.push_back(nm);
-            if(check and nextBoard.isKingUnderAttack(pc, false)) out.pop_back();
+            out.push_back(nm);
+            if(at(fx, fy).color == at(nx, ny).color) out.pop_back();
+            else if(at(fx, fy).name == PIECE_NAMES::PAWN) out.pop_back();
+            else if(check and nextBoard.isKingUnderAttack(pc, false)) out.pop_back();
 
             break;
         }
@@ -144,7 +146,7 @@ public:
 
     void makeMove(int fx, int fy, Move mv){
         Piece tmp = board[fx + fy*8];
-        board[fx + fy*8] = {PIECE_NAMES::NO_PIECE};
+        board[fx + fy*8] = Piece(PIECE_NAMES::NO_PIECE);
         tmp.moves_done++;
         int tx = mv.delta_x + fx;
         int ty = mv.delta_y + fy;
@@ -152,7 +154,6 @@ public:
     }
 
     std::vector<Move> getMoves(int x, int y, bool check = true){
-        //std::cout<<"getMovesstart\n";
         int index = y*8 + x;
         if(board[index].name == PIECE_NAMES::NO_PIECE) return {};
 
@@ -173,22 +174,15 @@ public:
             std::copy(tmp.begin(), tmp.end(), std::back_inserter(out));
         }
 
-        //std::cout<<toString()<<std::endl;
-
-        //std::cout<<"hihi\n"<<x<<" "<<y<<" "<<check<<std::endl;
-
         if(at(x, y).name == PIECE_NAMES::PAWN){
             Move sm = {1,1};
             if(at(x, y).color == PIECE_COLOR::WHITE) reverseMove(sm);
             int ex = x + sm.delta_x;
             int ey = y + sm.delta_y;
-            //std::cout<<ex<<" :ex2 2ey:"<<ey<<std::endl;
             if(ex >= 0 and ey >= 0 and ey < 8 and ex < 8){
-                //std::cout<<ex<<" :ex1 1ey:"<<ey<<std::endl;
                 if(at(ex, ey).name != PIECE_NAMES::NO_PIECE){
                     if(at(ex, ey).color != at(x, y).color){
                         Board nextBoard(this->board);
-                        //std::cout<<ex<<" :ex ey:"<<ey<<std::endl;
                         nextBoard.makeMove(ex, ey, sm);
                         out.push_back(sm);
 
@@ -199,13 +193,10 @@ public:
                 }
             }
 
-            //std::cout<<"hi2\n";
-
             sm = {-1,1};
             if(at(x, y).color == PIECE_COLOR::WHITE) reverseMove(sm);
             ex = x + sm.delta_x;
             ey = y + sm.delta_y;
-            //std::cout<<ex<<" :ex3 3ey:"<<ey<<std::endl;
             if(ex >= 0 and ey >= 0 and ey < 8 and ex < 8){
                 if(at(ex, ey).name != PIECE_NAMES::NO_PIECE){
                     if(at(ex, ey).color != at(x, y).color){
@@ -220,8 +211,6 @@ public:
                 }
             }
         }
-
-        //std::cout<<"getmovesend\n";
 
         return out;
     }

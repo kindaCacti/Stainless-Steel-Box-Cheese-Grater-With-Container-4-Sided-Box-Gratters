@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
 #include "pieces.h"
 #include "board.h"
+#include "game.h"
 #include <string>
+#include <iostream>
 
 TEST(TEST_PIECES, CREATE_PIECE){
     Piece tmp = {PIECE_NAMES::BISHOP, PIECE_COLOR::BLACK};
@@ -106,3 +108,93 @@ TEST(TEST_BOARD, GENERATE_MOVES){
     tmp = b.getMoves(1, 0);
     ASSERT_EQ(tmp.size(), 2);
 }
+
+TEST(TEST_BOARD, GET_MOVES_OF_COLOR){
+    Board b;
+    b.setPieces();
+    int tmp = b.getMovesOfColor(PIECE_COLOR::WHITE).size();
+
+    ASSERT_EQ(tmp, 20);
+}
+
+TEST(TEST_BOARD, MAKE_MOVE){
+    Board b;
+    b.setPieces();
+
+    b.makeMove(0,0, {2, 2});
+
+    ASSERT_EQ(b.at(2,2).name, PIECE_NAMES::ROOK);
+}
+
+TEST(TEST_BOARD, IS_KING_UNDER_ATTACK){
+    Board b;
+    b.setPieces();
+    
+    ASSERT_EQ(b.isKingUnderAttack(PIECE_COLOR::BLACK), false);
+    b.makeMove(3,7, {0, -7});
+
+    ASSERT_EQ(b.isKingUnderAttack(PIECE_COLOR::BLACK), true);
+}
+
+TEST(TEST_BOARD, IS_CHECKMATE){
+    Board b;
+    b.setPieces();
+    
+    ASSERT_EQ(b.isCheckmate(PIECE_COLOR::BLACK), false);
+    b.makeMove(3,7, {0, -7});
+    b.makeMove(3,6, {1, -5});
+
+    ASSERT_EQ(b.isCheckmate(PIECE_COLOR::BLACK), true);
+}
+
+TEST(TEST_GAME, CREATE_GAME){
+    Game g;
+    ASSERT_EQ(g.getRound(), 1);
+    ASSERT_EQ(g.isOngoing(), true);
+    ASSERT_EQ(g.turnOf(), PIECE_COLOR::WHITE);
+}
+
+TEST(TEST_GAME, NEXT_TURN){
+    Game g;
+    g.nextTurn();
+    g.nextTurn();
+    g.nextTurn();
+    g.nextTurn();
+    g.nextTurn();
+    ASSERT_EQ(g.getRound(), 6);
+    ASSERT_EQ(g.isOngoing(), true);
+    ASSERT_EQ(g.turnOf(), PIECE_COLOR::BLACK);
+}
+
+TEST(TEST_GAME, TRANSATE_TO_MOVE_INDEX){
+    Game g;
+    int tmp = g.translateToMoveIndex('c', '5');
+    ASSERT_EQ(tmp, 26);
+    tmp = g.translateToMoveIndex('e', '1');
+    ASSERT_EQ(tmp, 60);
+}
+
+TEST(TEST_GAME, MAKE_MOVE){
+    Game g;
+    bool tmp = g.choosePiece('c', '3', std::cout);
+    ASSERT_EQ(tmp, false);
+    tmp = g.choosePiece('c', '2', std::cout);
+    ASSERT_EQ(tmp, true);
+    tmp = g.makeMove('c', '2');
+    ASSERT_EQ(tmp, false);
+    tmp = g.makeMove('c', '3');
+    ASSERT_EQ(tmp, false);
+}
+
+TEST(TEST_GAME, IS_END){
+    Game g;
+    g.isEnd(std::cout);
+    ASSERT_EQ(g.isOngoing(), true);
+    Board& b = g.getBoard();
+    b.makeMove(3,7, {0, -7});
+    b.makeMove(3,6, {1, -5});
+    g.nextTurn();
+    g.isEnd(std::cout);
+    ASSERT_EQ(g.isOngoing(), false);
+}
+

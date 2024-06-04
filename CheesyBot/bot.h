@@ -29,44 +29,45 @@ public:
     }
 
     void addBranches(int round, int from){
-        std::cout<<"for round: "<<round<<std::endl;
+        std::cout<<"for round: "<<depth[from]<<std::endl;
         Board board(tree[from]);
 
         PIECE_COLOR currentColor = (round%2) ? PIECE_COLOR::WHITE : PIECE_COLOR::BLACK;
 
-        std::cout<<"hi\n";
+        //std::cout<<"hi\n";
 
         for(int i = 0; i<64; i++){
-            std::cout<<"starting "<<i<<std::endl;
+            //std::cout<<"starting "<<i<<std::endl;
             int x = i%8;
             int y = i/8;
 
             if(board.at(i).name == PIECE_NAMES::NO_PIECE) continue;
             if(board.at(i).color != currentColor) continue;
 
-            std::cout<<"getting moves\n";
+            //std::cout<<"getting moves\n";
             std::vector<Move> moves = board.getMoves(x, y);
-            std::cout<<"movs: "<<moves.size()<<std::endl;
-            std::cout<<"hihi\n";
+            //std::cout<<"movs: "<<moves.size()<<std::endl;
+            //std::cout<<"hihi\n";
             for(Move mv : moves){
-                std::cout<<board.toString()<<std::endl;
-                std::cout<<"trying: "<<x<<"x"<<y<<" "<<mv.delta_x<<"x"<<mv.delta_y<<std::endl;
+                //std::cout<<board.toString()<<std::endl;
+                //std::cout<<"trying: "<<x<<"x"<<y<<" "<<mv.delta_x<<"x"<<mv.delta_y<<std::endl;
                 depth.push_back(depth[from] + 1);
                 parent.push_back(from);
-                Board tmp(tree[from]);
+                Board tmp(board.getBoard());
                 tmp.makeMove(x, y, mv);
-                std::cout<<tmp.toString()<<std::endl;
+                //std::cout<<tmp.toString()<<std::endl;
                 tree.push_back(tmp.getBoard());
                 toHere.push_back({x, y, mv});
             }
-            std::cout<<"ended\n";
+            //std::cout<<"ended\n";
         }
     }
 
     void fillTree(int round, int maxDepth = 2){
         for(int i = 0; i<tree.size(); i++){
-            std::cout<<"hello2\n";
-            if(depth[i] == maxDepth) break;
+            //std::cout<<depth[i]<<" : dep\n";
+            //std::cout<<"hello2\n";
+            if(depth[i] >= maxDepth) break;
             addBranches(round + depth[i], i);
         }
     }
@@ -95,7 +96,7 @@ public:
         evalScore.assign(tree.size(), 0);
 
         for(int i = tree.size() - 1; i>0; i--){
-            std::cout<<"hello\n";
+            //std::cout<<"hello\n";
             int prev = parent[i];
             if(!done[prev]){
                 evalScore[prev] = score[i] * ((depth[i]%2)?1:-1);
@@ -111,14 +112,12 @@ public:
     }
 
     std::vector<int> getBestMove(int round, int dep = 2){
-        /*fillTree(round, dep);
+        fillTree(round, dep);
 
-        std::cout<<"eval\n";
+        //std::cout<<"eval\n";
         evaluateTree();
 
-        return {bestMove[0].fx, bestMove[0].fy, bestMove[0].fx + bestMove[0].mv.delta_x, bestMove[0].fy + bestMove[0].mv.delta_y};*/
-
-        return getRandomMove(round);
+        return {bestMove[0].fx, bestMove[0].fy, bestMove[0].fx + bestMove[0].mv.delta_x, bestMove[0].fy + bestMove[0].mv.delta_y};
     }
 
     std::vector<int> getRandomMove(int round){
