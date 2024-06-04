@@ -12,6 +12,7 @@ private:
   unsigned int mHeight;
   VertexArray vertexArray;
   Texture texture;
+  glm::mat4 projectionMatrix;
 
 public:
   // Needs to be executed in context for imageRects to work:
@@ -25,11 +26,9 @@ public:
   static Renderer *renderer;
 
   ImageRect(const std::string &filepath);
-  ImageRect(const std::string &filepath, int width, int height);
   ~ImageRect();
 
   void draw(int x, int y);
-  void draw(int x, int y, unsigned int width, unsigned int height);
 
 private:
   GLFWvidmode getWindowSize();

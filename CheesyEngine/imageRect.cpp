@@ -53,11 +53,11 @@ ImageRect::ImageRect(const std::string &filepath) : texture(filepath) {
   // Calculating transformation
   int w, h;
   glfwGetWindowSize(glfwGetCurrentContext(), &w, &h);
-  glm::mat4 proj = glm::ortho(0.0f, (float)w, 0.0f, (float)h, -1.0f, 1.0f);
+  projectionMatrix = glm::ortho(0.0f, (float)w, 0.0f, (float)h, -1.0f, 1.0f);
 
   // Setting shader uniforms
   shader->bind();
-  shader->setUniformMat4f("uMVP", proj);
+  shader->setUniformMat4f("uMVP", projectionMatrix);
 
   texture.bind();
   shader->setUniform1i("uTexture", 0);
@@ -71,5 +71,9 @@ ImageRect::ImageRect(const std::string &filepath) : texture(filepath) {
 ImageRect::~ImageRect() {}
 
 void ImageRect::draw(int x, int y) {
+  glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0));
+  shader->bind();
+  shader->setUniformMat4f("uMVP", projectionMatrix * trans);
+  shader->unbind();
   renderer->draw(vertexArray, *indexBuffer, *shader);
 }

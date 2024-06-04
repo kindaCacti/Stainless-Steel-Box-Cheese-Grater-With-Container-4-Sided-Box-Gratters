@@ -14,9 +14,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-int main() {
-  GLFWwindow *window;
-
+int init(GLFWwindow *&window, int width, int height, const char *title) {
   if (!glfwInit()) {
     std::cout << "Failed to initialize GLFW" << std::endl;
     return -1;
@@ -26,7 +24,7 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  window = glfwCreateWindow(1100, 800, "Say Cheeseee", NULL, NULL);
+  window = glfwCreateWindow(width, height, title, NULL, NULL);
   if (!window) {
     glfwTerminate();
     return -1;
@@ -40,46 +38,29 @@ int main() {
     std::cout << "Failed to initialize GLEW" << std::endl;
     return -1;
   }
+
+  GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+  GLCall(glEnable(GL_BLEND));
+
+  return 0;
+}
+
+int main() {
+  GLFWwindow *window;
+  if (init(window, 1100, 800, "Say Cheeseee") == -1)
+    return -1;
   {
     ImageRect::initializeImageRects();
-
-    float positions[] = {
-        0.0f,   0.0f,   0.0f, 0.0f, // bottom left
-        800.0f, 0.0f,   1.0f, 0.0f, // bottom right
-        800.0f, 800.0f, 1.0f, 1.0f, // top right
-        0.0f,   800.0f, 0.0f, 1.0f  // top left
-    };
-    unsigned int indices[] = {0, 1, 2, 2, 3, 0};
-
-    GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-    GLCall(glEnable(GL_BLEND));
-
     ImageRect boardImg("res/textures/board.png");
-
     Renderer renderer;
-
-    float r = 0.0f;
-    float increment = 0.05f;
-
     while (!glfwWindowShouldClose(window)) {
       renderer.clear();
-
-      boardImg.draw(0, 0);
-
-      if (r > 1.0f)
-        increment = -0.05f;
-      else if (r < 0)
-        increment = 0.05f;
-      r += increment;
-
+      boardImg.draw(10, 10);
       glfwSwapBuffers(window);
-
       glfwPollEvents();
     }
-
     ImageRect::deinitializeImageRects();
   }
-
   glfwTerminate();
   return 0;
 }
