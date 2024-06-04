@@ -94,13 +94,15 @@ void App::mouseButtonCallback(GLFWwindow *window, int button, int action,
         if (element->getX() == x && element->getY() == y) {
           currentElement = element;
           highlightElements[0]->setPos(x, y);
-          api.choosePiece((x / 100) + 'a', (y / 100) + '1');
-          api.loadPossibleMoves();
-          auto moves = api.getPossibleMoves();
-          for (int i = 0; i < moves.size(); ++i) {
-            auto &m = moves[i];
-            highlightElements[i + 1]->setPos(x + m.delta_x * 100,
-                                             y + m.delta_y * 100);
+          if (api.getBoard().at(x / 100, y / 100).color == api.turnOf()) {
+            api.choosePiece((x / 100) + 'a', (y / 100) + '1');
+            api.loadPossibleMoves();
+            auto moves = api.getPossibleMoves();
+            for (int i = 0; i < moves.size(); ++i) {
+              auto &m = moves[i];
+              highlightElements[i + 1]->setPos(x + m.delta_x * 100,
+                                               y + m.delta_y * 100);
+            }
           }
         }
       }
