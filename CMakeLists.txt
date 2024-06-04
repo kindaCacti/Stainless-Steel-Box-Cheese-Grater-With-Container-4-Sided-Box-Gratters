@@ -29,6 +29,14 @@ set(APP_SOURCES
    ${APP_FOLDER}/app.h
    ${APP_FOLDER}/renderer.h
    ${APP_FOLDER}/renderer.cpp
+   ${APP_FOLDER}/vertexBuffer.h
+   ${APP_FOLDER}/vertexBuffer.cpp
+   ${APP_FOLDER}/indexBuffer.h
+   ${APP_FOLDER}/indexBuffer.cpp
+   ${APP_FOLDER}/vertexBufferLayout.h
+   ${APP_FOLDER}/vertexBufferLayout.cpp
+   ${APP_FOLDER}/vertexArray.h
+   ${APP_FOLDER}/vertexArray.cpp
    ${APP_FOLDER}/texture.h
    ${APP_FOLDER}/texture.cpp
 )

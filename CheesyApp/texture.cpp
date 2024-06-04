@@ -1,14 +1,12 @@
-#include "texture.h"
-#include "../ThirdParty/glad.h"
-#include <GLFW/glfw3.h>
 
-Texture::Texture(const std::string &path)
-    : filepath(path), localBuffer(nullptr), width(0), height(0), BPP(0) {
-  // GLcall(glGenTextures(1, &rendererID));
-}
 
-Texture::~Texture() {}
+// Texture::Texture(const std::string &path)
+//     : filepath(path), localBuffer(nullptr), width(0), height(0), BPP(0) {
+//   // GLcall(glGenTextures(1, &rendererID));
+// }
 
-void Texture::bind(unsigned int slot) const {}
+// Texture::~Texture() {}
 
-void Texture::unbind() const {}
+// void Texture::bind(unsigned int slot) const {}
+
+// void Texture::unbind() const {}
