@@ -44,8 +44,6 @@ int main(){
             bool tmp1 = game.choosePiece(bmove[0], bmove[1], std::cout);
             game.showPossibleMoves(std::cout);
             bool tmp2 = game.makeMove(bmove[2], bmove[3]);
-
-            std::cout<<bmove[0]<<bmove[1]<<" -- "<<bmove[2]<<bmove[3]<<std::endl;
         }
 
         game.isEnd(std::cout);
