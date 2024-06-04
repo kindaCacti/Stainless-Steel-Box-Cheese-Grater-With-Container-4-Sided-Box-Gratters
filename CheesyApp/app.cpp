@@ -1,9 +1,10 @@
 #include "app.h"
 #include <stdexcept>
 
-std::vector<AppElementInterface *> App::staticElements;
-std::vector<AppElementInterface *> App::pieceElements;
+AppElementInterface *App::boardElement = nullptr;
 std::vector<AppElementInterface *> App::highlightElements;
+std::vector<AppElementInterface *> App::pieceElements;
+Game App::api;
 AppElementInterface *App::currentElement = nullptr;
 App::App() {
   if (initWindow(800, 800, "Say Cheeseee") == -1) {
@@ -19,9 +20,15 @@ App::App() {
 }
 
 void App::initializeBoard() {
-  staticElements.push_back(new AppElement<ImageRect>(
+  boardElement = new AppElement<ImageRect>(
       new ImageRect("res/textures/board.png", 800, 800), false, true,
-      marginLeft, 0));
+      marginLeft, 0);
+
+  for (int i = 0; i < 32; ++i) {
+    highlightElements.push_back(new AppElement<ImageRect>(
+        new ImageRect("res/textures/highlight.png", 100, 100), false, true,
+        1000, 1000));
+  }
 
   int pawnRows[2] = {1, 6};
   int figureRows[2] = {0, 7};
@@ -64,22 +71,11 @@ Position App::notationToPosition(char x, char y) const {
   return Position(int(x - 'a') * 100, int(y - '1') * 100);
 }
 
-void App::tick(double delta) {
-  for (auto element : staticElements) {
-    element->tick(delta);
-  }
-  for (auto element : highlightElements) {
-    element->tick(delta);
-  }
-  for (auto element : pieceElements) {
-    element->tick(delta);
-  }
-}
+void App::tick(double delta) {}
 
 void App::draw() {
-  for (auto element : staticElements) {
-    element->draw();
-  }
+  if (boardElement)
+    boardElement->draw();
   for (auto element : highlightElements) {
     element->draw();
   }
@@ -95,13 +91,35 @@ void App::mouseButtonCallback(GLFWwindow *window, int button, int action,
     int y = (800 - mousePos.y) / 100 * 100;
     if (currentElement == nullptr) {
       for (auto element : pieceElements) {
-        if (element->getX() == x && element->getY() == y)
+        if (element->getX() == x && element->getY() == y) {
           currentElement = element;
+          highlightElements[0]->setPos(x, y);
+          api.choosePiece((x / 100) + 'a', (y / 100) + '1');
+          api.loadPossibleMoves();
+          auto moves = api.getPossibleMoves();
+          for (int i = 0; i < moves.size(); ++i) {
+            auto &m = moves[i];
+            highlightElements[i + 1]->setPos(x + m.delta_x * 100,
+                                             y + m.delta_y * 100);
+          }
+        }
       }
     } else {
       auto move = getMove(currentElement->getX() / 100,
                           currentElement->getY() / 100, x / 100, y / 100);
-      currentElement->setPos(x, y);
+      bool result = api.movePiece(move.substr(0, 2), move.substr(2, 2));
+      if (result) {
+        for (int i = 0; i < pieceElements.size(); ++i) {
+          if (pieceElements[i]->getX() == x && pieceElements[i]->getY() == y) {
+            delete pieceElements[i];
+            pieceElements.erase(pieceElements.begin() + i);
+          }
+        }
+        currentElement->setPos(x, y);
+      }
+      for (auto element : highlightElements) {
+        element->setPos(1000, 1000);
+      }
       currentElement = nullptr;
     }
   }
@@ -172,10 +190,7 @@ int App::initWindow(int width, int height, const char *title) {
 }
 
 App::~App() {
-  for (auto element : staticElements) {
-    delete element;
-  }
-  staticElements.clear();
+  delete boardElement;
   for (auto element : highlightElements) {
     delete element;
   }
