@@ -1,4 +1,8 @@
 build
 .vscode
 .vscode/*
+<<<<<<< HEAD
+notUsed
+=======
 *.exe
+>>>>>>> 80380957ec370b7cc9a0616a4f6abb28f373babc
