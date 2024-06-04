@@ -12,9 +12,11 @@ public:
     Board(Piece*);
     Piece* getBoard(){ return board; }
     void setPieces();
+    void promote();
     std::string toString() const;
     Piece at(int, int);
     Piece at(int index){ return board[index]; }
+    void setAt(int, int, Piece);
     std::vector<Move> generateMoves(Move, int, int, int, bool = true);
     void reverseMove(Move&);
     int getKingPosition(PIECE_COLOR);

@@ -134,6 +134,8 @@ void Board::makeMove(int fx, int fy, Move mv){
     int tx = mv.delta_x + fx;
     int ty = mv.delta_y + fy;
     board[tx + ty*8] = tmp;
+
+    promote();
 }
 
 std::vector<Move> Board::getMoves(int x, int y, bool check){
@@ -227,4 +229,25 @@ bool Board::isStalemate(PIECE_COLOR pc){
     int ky = kingPos/8;
     if(!isKingUnderAttack(pc) and getMovesOfColor(pc).size() == 0) return true;
     return false;
+}
+
+void Board::setAt(int x, int y, Piece _piece){
+    int index = y*8 + x;
+    board[index] = _piece;
+}
+
+void Board::promote(){
+    for(int i = 0; i<8; i++){
+        if(at(i, 0).name == PIECE_NAMES::PAWN){
+            Piece tmp = at(i, 0);
+            tmp.name = PIECE_NAMES::QUEEN;
+            setAt(i, 0, tmp);
+        }
+
+        if(at(i, 7).name == PIECE_NAMES::PAWN){
+            Piece tmp = at(i, 7);
+            tmp.name = PIECE_NAMES::QUEEN;
+            setAt(i, 7, tmp);
+        }
+    }
 }

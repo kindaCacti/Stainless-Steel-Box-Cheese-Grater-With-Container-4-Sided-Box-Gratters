@@ -28,7 +28,8 @@ public:
   bool movePiece(std::string, std::string);
   std::string translateToChessCoordinates(Move);
   void showPossibleMoves(std::ostream&);
-  void showPossibleMoves();
+  void loadPossibleMoves();
+  std::vector<Move>& getPossibleMoves() { return possibleMoves; };
   void nextTurn();
   bool makeMove(char, char);
   bool isEnd(std::ostream&);
