@@ -12,6 +12,10 @@ public:
       : mTickable(tickable), mDrawable(drawable), mX(x), mY(y) {}
   virtual ~AppElementInterface() {}
 
+  virtual AppElementInterface &operator=(AppElementInterface *other) {
+    return *this;
+  };
+
   virtual void setX(int x) {}
   virtual void setY(int y) {}
   virtual int getX() {}
@@ -30,6 +34,12 @@ public:
   AppElement(T *element, bool tickable, bool drawable, int x = 0, int y = 0)
       : mElement(element), AppElementInterface(tickable, drawable, x, y) {}
   ~AppElement() { delete mElement; }
+
+  AppElement &operator=(AppElement *other) {
+    delete mElement;
+    this = other;
+    return *this;
+  }
 
   void setX(int x) { mX = x; }
   void setY(int y) { mY = y; }
