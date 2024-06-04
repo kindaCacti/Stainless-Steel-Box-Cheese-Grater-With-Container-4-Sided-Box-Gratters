@@ -38,6 +38,9 @@ struct Piece{
     PIECE_NAMES name;
     PIECE_COLOR color;
     int moves_done = 0;
+
+    Piece() = default;
+    Piece(PIECE_NAMES pn, PIECE_COLOR pc = PIECE_COLOR::WHITE, int mov = 0): name(pn), color(pc), moves_done(mov) {}
 };
 
 struct MovePossibilities{
@@ -79,7 +82,7 @@ char pieceChar(Piece tp){
 MovePossibilities getBaseMoves(PIECE_NAMES pn, int moves_done = 0){
     switch(pn){
         case PIECE_NAMES::PAWN:
-            if(!moves_done) return {{}, {MOVES::UP, MOVES::PAWN_MOVES}};
+            if(moves_done == 0) return {{}, {MOVES::UP, MOVES::PAWN_MOVES}};
             return {{}, {MOVES::UP}};
         case PIECE_NAMES::BISHOP:
             return {{MOVES::UL_DIAG, MOVES::UR_DIAG, MOVES::DL_DIAG, MOVES::DR_DIAG}, {}};
