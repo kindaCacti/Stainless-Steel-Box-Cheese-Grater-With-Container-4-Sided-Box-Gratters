@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "./CheesyApi/game.h"
+#include "./CheesyBot/bot.h"
 
 int main(){
     Game game;
@@ -10,6 +11,12 @@ int main(){
         int roundAtTheStart = game.getRound();
 
         do{
+            std::cout<<"Bots best move is: ";
+            Bot b(game.getBoard());
+            
+            std::vector<int> bestMove = b.getRandomMove(game.getRound());
+            std::cout<<b.convertToChessNotation(bestMove[0], bestMove[1])<<" "<<
+            b.convertToChessNotation(bestMove[2], bestMove[3])<<std::endl;
             do{
                 std::cout<<game.askForMovement();
                 std::cin>>movX>>movY;
