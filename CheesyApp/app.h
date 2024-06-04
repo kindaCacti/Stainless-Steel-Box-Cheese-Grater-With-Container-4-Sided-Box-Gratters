@@ -11,19 +11,25 @@
 #include <vector>
 
 struct Position {
-  int x, y;
+  int x = 0;
+  int y = 0;
 
+  Position() = default;
   Position(int sx, int sy) : x(sx), y(sy) {}
 };
 
 class App {
+public:
+  static std::vector<AppElementInterface *> staticElements;
+  static std::vector<AppElementInterface *> pieceElements;
+  static std::vector<AppElementInterface *> highlightElements;
+  static AppElementInterface *currentElement;
+  static Position mousePos;
+
 private:
   GLFWwindow *window;
-  std::vector<AppElementInterface *> staticElements;
-  std::vector<AppElementInterface *> pieceElements;
-  std::vector<AppElementInterface *> highlightElements;
   int marginLeft = 0;
-  // Game api;
+  Game api;
 
 public:
   App();
@@ -38,4 +44,10 @@ private:
 
   void initializeBoard();
   Position notationToPosition(char x, char y) const;
+
+  void mouseButtonCallback(GLFWwindow *window, int button, int action,
+                           int mods);
+  static void cursorPositionCallback(GLFWwindow *window, double xpos,
+                                     double ypos);
+  std::string getMove(int srcPosX, int srcPosY, int dstPosX, int dstPosY);
 };

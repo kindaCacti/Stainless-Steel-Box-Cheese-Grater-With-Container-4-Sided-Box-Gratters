@@ -14,6 +14,8 @@ public:
 
   virtual void setX(int x) {}
   virtual void setY(int y) {}
+  virtual int getX() {}
+  virtual int getY() {}
   virtual void setPos(int x, int y) {}
 
   virtual void tick(double delta) {}
@@ -31,6 +33,8 @@ public:
 
   void setX(int x) { mX = x; }
   void setY(int y) { mY = y; }
+  int getX() { return mX; }
+  int getY() { return mY; }
   void setPos(int x, int y) {
     mX = x;
     mY = y;

@@ -1,10 +1,17 @@
 #include "app.h"
 #include <stdexcept>
 
+std::vector<AppElementInterface *> App::staticElements;
+std::vector<AppElementInterface *> App::pieceElements;
+std::vector<AppElementInterface *> App::highlightElements;
+AppElementInterface *App::currentElement = nullptr;
 App::App() {
   if (initWindow(800, 800, "Say Cheeseee") == -1) {
     throw "Failed to initialize the app!";
   }
+  glfwSetMouseButtonCallback(window, (GLFWmousebuttonfun)&mouseButtonCallback);
+  glfwSetCursorPosCallback(window, (GLFWcursorposfun)&cursorPositionCallback);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
   ImageRect::initializeImageRects();
   initializeBoard();
 
@@ -12,7 +19,7 @@ App::App() {
 }
 
 void App::initializeBoard() {
-  pieceElements.push_back(new AppElement<ImageRect>(
+  staticElements.push_back(new AppElement<ImageRect>(
       new ImageRect("res/textures/board.png", 800, 800), false, true,
       marginLeft, 0));
 
@@ -58,27 +65,61 @@ Position App::notationToPosition(char x, char y) const {
 }
 
 void App::tick(double delta) {
-  // for (auto element : staticElements) {
-  //   element->tick(delta);
-  // }
-  // for (auto element : highlightElements) {
-  //   element->tick(delta);
-  // }
+  for (auto element : staticElements) {
+    element->tick(delta);
+  }
+  for (auto element : highlightElements) {
+    element->tick(delta);
+  }
   for (auto element : pieceElements) {
     element->tick(delta);
   }
 }
 
 void App::draw() {
-  // for (auto element : staticElements) {
-  //   element->draw();
-  // }
-  // for (auto element : highlightElements) {
-  //   element->draw();
-  // }
+  for (auto element : staticElements) {
+    element->draw();
+  }
+  for (auto element : highlightElements) {
+    element->draw();
+  }
   for (auto element : pieceElements) {
     element->draw();
   }
+}
+
+void App::mouseButtonCallback(GLFWwindow *window, int button, int action,
+                              int mods) {
+  if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+    int x = mousePos.x / 100 * 100;
+    int y = (800 - mousePos.y) / 100 * 100;
+    if (currentElement == nullptr) {
+      for (auto element : pieceElements) {
+        if (element->getX() == x && element->getY() == y)
+          currentElement = element;
+      }
+    } else {
+      auto move = getMove(currentElement->getX() / 100,
+                          currentElement->getY() / 100, x / 100, y / 100);
+      currentElement->setPos(x, y);
+      currentElement = nullptr;
+    }
+  }
+}
+
+std::string App::getMove(int srcPosX, int srcPosY, int dstPosX, int dstPosY) {
+  std::string result;
+  result += ('a' + srcPosX);
+  result += ('1' + srcPosY);
+  result += ('a' + dstPosX);
+  result += ('1' + dstPosY);
+  return result;
+}
+
+Position App::mousePos;
+void App::cursorPositionCallback(GLFWwindow *window, double xpos, double ypos) {
+  mousePos.x = xpos;
+  mousePos.y = ypos;
 }
 
 void App::mainLoop() {
@@ -131,14 +172,14 @@ int App::initWindow(int width, int height, const char *title) {
 }
 
 App::~App() {
-  // for (auto element : staticElements) {
-  //   delete element;
-  // }
-  // staticElements.clear();
-  // for (auto element : highlightElements) {
-  //   delete element;
-  // }
-  // highlightElements.clear();
+  for (auto element : staticElements) {
+    delete element;
+  }
+  staticElements.clear();
+  for (auto element : highlightElements) {
+    delete element;
+  }
+  highlightElements.clear();
   for (auto element : pieceElements) {
     delete element;
   }
