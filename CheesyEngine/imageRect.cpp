@@ -1,0 +1,75 @@
+#include "imageRect.h"
+#include "renderer.h"
+
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
+#include "GLFW/glfw3.h"
+
+unsigned int ImageRect::indices[6] = {
+    // to make a square
+    0, 1, 2, // bottom right triangle
+    2, 3, 0  // top left triangle
+};
+Renderer *ImageRect::renderer = nullptr;
+IndexBuffer *ImageRect::indexBuffer = nullptr;
+Shader *ImageRect::shader = nullptr;
+
+void ImageRect::initializeImageRects() {
+  ImageRect::renderer = new Renderer();
+  ImageRect::indexBuffer = new IndexBuffer(ImageRect::indices, 6);
+  ImageRect::shader = new Shader("res/shaders/basic.glsl");
+}
+
+void ImageRect::deinitializeImageRects() {
+  delete ImageRect::renderer;
+  delete ImageRect::indexBuffer;
+  delete ImageRect::shader;
+}
+
+ImageRect::ImageRect(const std::string &filepath) : texture(filepath) {
+  if (!renderer || !indexBuffer || !shader) {
+    std::cout << "Required static variables of ImageRect not initialized! Use "
+                 "'ImageRect::initializeImageRects()' to do so."
+              << std::endl;
+  }
+  // Calculating vertices
+  float width = (float)texture.getWidth();
+  float height = (float)texture.getHeight();
+  float positions[] = {
+      0.0f,  0.0f,   0.0f, 0.0f, // bottom left
+      width, 0.0f,   1.0f, 0.0f, // bottom right
+      width, height, 1.0f, 1.0f, // top right
+      0.0f,  height, 0.0f, 1.0f  // top left
+  };
+
+  // Loading vertices
+  VertexBuffer vb(positions, 4 * 4 * sizeof(float));
+  VertexBufferLayout layout;
+  layout.push<float>(2);
+  layout.push<float>(2);
+  vertexArray.AddBuffer(vb, layout);
+
+  // Calculating transformation
+  int w, h;
+  glfwGetWindowSize(glfwGetCurrentContext(), &w, &h);
+  glm::mat4 proj = glm::ortho(0.0f, (float)w, 0.0f, (float)h, -1.0f, 1.0f);
+
+  // Setting shader uniforms
+  shader->bind();
+  shader->setUniformMat4f("uMVP", proj);
+
+  texture.bind();
+  shader->setUniform1i("uTexture", 0);
+
+  vertexArray.unbind();
+  vb.unbind();
+  indexBuffer->unbind();
+  shader->unbind();
+}
+
+ImageRect::~ImageRect() {}
+
+void ImageRect::draw(int x, int y) {
+  renderer->draw(vertexArray, *indexBuffer, *shader);
+}
