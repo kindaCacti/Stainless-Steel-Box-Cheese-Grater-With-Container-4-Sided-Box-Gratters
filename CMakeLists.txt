@@ -23,7 +23,9 @@ set(THIRD_PARTY_FOLDER ThirdParty)
 
 set(API_SOURCES
    ${API_FOLDER}/board.h
+   ${API_FOLDER}/board.cpp
    ${API_FOLDER}/game.h
+   ${API_FOLDER}/game.cpp
    ${API_FOLDER}/pieces.h
    ${API_FOLDER}/pieces.cpp
 )
@@ -66,9 +68,19 @@ ${APP_SOURCES}
 ${THIRD_PARTY_SOURCES}
 )
 
+set(DEMO_SOURCES
+${API_SOURCES}
+${BOT_SOURCES}
+)
+
+set(TEST_SOURCES
+${API_FOLDER}/testApi.cpp
+${BOT_FOLDER}/testBot.cpp
+)
+
 include_directories(${THIRD_PARTY_FOLDER} ${ENGINE_FOLDER} ${API_FOLDER})
 
-# add_executable(demo main.cpp ${PROJECT_SOURCES} )
+add_executable(demo main.cpp ${DEMO_SOURCES} )
 add_executable(app ${APP_FOLDER}/main.cpp ${PROJECT_SOURCES} )
 
 find_package(glfw3 REQUIRED)
@@ -76,5 +88,5 @@ set(PROJECT_LIBARIES glfw3.lib opengl32.lib glew32.lib)
 
 # target_link_libraries(demo ${PROJECT_LIBARIES})
 target_link_libraries(app ${PROJECT_LIBARIES})
-# add_executable(testGoogle testGoogle.cpp ${PROJECT_SOURCES})
-# target_link_libraries(testGoogle PUBLIC gtest_main)
+add_executable(testGoogle ${TEST_SOURCES} ${DEMO_SOURCES})
+target_link_libraries(testGoogle PUBLIC gtest_main)

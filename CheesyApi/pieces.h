@@ -34,8 +34,7 @@ struct Move {
   Move operator*(int a) const { return {delta_x * a, delta_y * a}; }
 
   bool operator==(Move &mv) {
-    if (mv.delta_x == delta_x and mv.delta_y == delta_y)
-      return true;
+    if (mv.delta_x == delta_x and mv.delta_y == delta_y) return true;
     return false;
   }
 
