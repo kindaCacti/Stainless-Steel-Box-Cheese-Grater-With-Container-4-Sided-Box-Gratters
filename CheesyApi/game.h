@@ -153,8 +153,8 @@ public:
   }
 
   Board &getBoard() { return gameBoard; }
-};
 
-std::ostream &operator<<(std::ostream &os, const Game game) {
-  return os << game.showGame();
-}
+  friend std::ostream &operator<<(std::ostream &os, const Game game) {
+    return os << game.showGame();
+  }
+};

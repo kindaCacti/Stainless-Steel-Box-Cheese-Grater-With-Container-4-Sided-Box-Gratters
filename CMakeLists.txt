@@ -25,6 +25,7 @@ set(API_SOURCES
    ${API_FOLDER}/board.h
    ${API_FOLDER}/game.h
    ${API_FOLDER}/pieces.h
+   ${API_FOLDER}/pieces.cpp
 )
 set(BOT_SOURCES
    ${BOT_FOLDER}/bot.h

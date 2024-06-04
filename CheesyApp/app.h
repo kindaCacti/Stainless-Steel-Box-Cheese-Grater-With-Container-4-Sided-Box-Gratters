@@ -1,6 +1,6 @@
 #pragma once
 #include "appElement.h"
-// #include "game.h"
+#include "game.h"
 #include "imageRect.h"
 #include "renderer.h"
 #include <GL/glew.h>
