@@ -124,12 +124,24 @@ void App::mouseButtonCallback(GLFWwindow *window, int button, int action,
       bool king =
           api.getBoard().at(x / 100, 7 - y / 100).name == PIECE_NAMES::KING;
       if (king) {
-        for (auto element : pieceElements) {
-          auto e = api.getBoard().at(element->getX() / 100,
-                                     7 - element->getY() / 100);
-          if (e.name == PIECE_NAMES::ROOK && e.moves_done == -1) {
-            int nx = element->getX() == 0 ? 3 : 5;
-            element->setPos(nx, element->getY());
+        Piece toCheck[2] = {
+            api.getBoard().at(currentElement->getX() + 1 / 100,
+                              7 - currentElement->getY() / 100),
+            api.getBoard().at(currentElement->getX() - 1 / 100,
+                              7 - currentElement->getY() / 100)};
+        for (int i = 0; i < 2; ++i) {
+          Piece &c = toCheck[i];
+          if (c.name == PIECE_NAMES::ROOK && c.moves_done == -1 &&
+              c.color != api.turnOf()) {
+            for (auto element : pieceElements) {
+              if (element->getX() / 100 ==
+                      currentElement->getX() + 1 - (2 * i) &&
+                  element->getY() == currentElement->getY()) {
+                element->setPos(currentElement->getX() + 1 - (2 * i),
+                                currentElement->getY());
+                break;
+              }
+            }
             break;
           }
         }
