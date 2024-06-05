@@ -86,43 +86,84 @@ void App::draw() {
 
 void App::mouseButtonCallback(GLFWwindow *window, int button, int action,
                               int mods) {
-  if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-    int x = mousePos.x / 100 * 100;
-    int y = (800 - mousePos.y) / 100 * 100;
-    if (currentElement == nullptr) {
-      for (auto element : pieceElements) {
-        if (element->getX() == x && element->getY() == y) {
-          currentElement = element;
-          highlightElements[0]->setPos(x, y);
-          if (api.getBoard().at(x / 100, y / 100).color == api.turnOf()) {
-            api.choosePiece((x / 100) + 'a', (y / 100) + '1');
-            api.loadPossibleMoves();
-            auto moves = api.getPossibleMoves();
-            for (int i = 0; i < moves.size(); ++i) {
-              auto &m = moves[i];
-              highlightElements[i + 1]->setPos(x + m.delta_x * 100,
-                                               y + m.delta_y * 100);
-            }
-          }
+  if (button != GLFW_MOUSE_BUTTON_LEFT || action != GLFW_RELEASE)
+    return;
+
+  int x = mousePos.x / 100 * 100;
+  int y = (800 - mousePos.y) / 100 * 100;
+
+  if (currentElement != nullptr) {
+    auto move = getMove(currentElement->getX() / 100,
+                        currentElement->getY() / 100, x / 100, y / 100);
+    bool result = api.movePiece(move.substr(0, 2), move.substr(2, 2));
+    if (result) {
+      for (int i = 0; i < pieceElements.size(); ++i) {
+        if (pieceElements[i]->getX() == x && pieceElements[i]->getY() == y) {
+          delete pieceElements[i];
+          pieceElements.erase(pieceElements.begin() + i);
         }
       }
-    } else {
-      auto move = getMove(currentElement->getX() / 100,
-                          currentElement->getY() / 100, x / 100, y / 100);
-      bool result = api.movePiece(move.substr(0, 2), move.substr(2, 2));
-      if (result) {
+      currentElement->setPos(x, y);
+      bool promotion = api.getBoard().at(x / 100, 7 - y / 100).moves_done == -1;
+      if (promotion) {
         for (int i = 0; i < pieceElements.size(); ++i) {
-          if (pieceElements[i]->getX() == x && pieceElements[i]->getY() == y) {
-            delete pieceElements[i];
-            pieceElements.erase(pieceElements.begin() + i);
+          if (pieceElements[i] == currentElement) {
+            delete currentElement;
+            std::string color(api.getBoard().at(x / 100, 7 - y / 100).color ==
+                                      PIECE_COLOR::WHITE
+                                  ? "white"
+                                  : "black");
+            std::string path = std::string("res/textures/") + color;
+            pieceElements[i] = new AppElement<ImageRect>(
+                new ImageRect(path + std::string("/Queen.png"), 100, 100),
+                false, true, x, y);
+            break;
           }
         }
-        currentElement->setPos(x, y);
       }
-      for (auto element : highlightElements) {
-        element->setPos(1000, 1000);
+      bool king =
+          api.getBoard().at(x / 100, 7 - y / 100).name == PIECE_NAMES::KING;
+      if (king) {
+        for (auto element : pieceElements) {
+          auto e = api.getBoard().at(element->getX() / 100,
+                                     7 - element->getY() / 100);
+          if (e.name == PIECE_NAMES::ROOK && e.moves_done == -1) {
+            int nx = element->getX() == 0 ? 3 : 5;
+            element->setPos(nx, element->getY());
+            break;
+          }
+        }
       }
-      currentElement = nullptr;
+
+      if (api.isEnd(std::cout)) {
+        std::string color(api.turnOf() == PIECE_COLOR::WHITE ? "black"
+                                                             : "white");
+        std::string path = std::string("res/textures/") + color;
+        path += "/Wins.png";
+        pieceElements.push_back(new AppElement<ImageRect>(
+            new ImageRect(path, 800, 400), false, true, 0, 200));
+      }
+    }
+    for (auto element : highlightElements) {
+      element->setPos(1000, 1000);
+    }
+    currentElement = nullptr;
+  }
+
+  for (auto element : pieceElements) {
+    if (element->getX() == x && element->getY() == y) {
+      currentElement = element;
+      if (api.getBoard().at(x / 100, 7 - y / 100).color == api.turnOf()) {
+        highlightElements[0]->setPos(x, y);
+        api.choosePiece((x / 100) + 'a', (y / 100) + '1');
+        api.loadPossibleMoves();
+        auto moves = api.getPossibleMoves();
+        for (int i = 0; i < moves.size(); ++i) {
+          auto &m = moves[i];
+          highlightElements[i + 1]->setPos(x + m.delta_x * 100,
+                                           y - m.delta_y * 100);
+        }
+      }
     }
   }
 }
