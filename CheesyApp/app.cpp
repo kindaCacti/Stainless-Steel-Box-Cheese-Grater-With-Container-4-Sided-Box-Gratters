@@ -17,7 +17,7 @@ std::string App::imgNameKnight("Knight.png");
 std::string App::imgNameBishop("Bishop.png");
 std::string App::imgNameQueen("Queen.png");
 std::string App::imgNameKing("King.png");
-std::string App::imgNameWin("Win.png");
+std::string App::imgNameWin("Wins.png");
 std::string App::imgNameHighlight("highlight.png");
 
 App::App() {
@@ -188,7 +188,7 @@ bool App::moveCurrentElementTo(int dstX, int dstY) {
     }
   }
 
-  return true;
+  return !checkIfEnded();
 }
 
 void App::removePieceAt(int x, int y) {
