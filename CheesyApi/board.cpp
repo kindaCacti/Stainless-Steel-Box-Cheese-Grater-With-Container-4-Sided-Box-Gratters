@@ -138,12 +138,14 @@ void Board::makeMove(int fx, int fy, Move mv){
     if(at(tx, ty).name == PIECE_NAMES::KING and mv.delta_x == 2){
         Piece tmp = at(7, fy);
         setAt(5, fy, tmp);
+        board[fy*8+5].moves_done = -1;
         board[7+8*fy] = Piece(PIECE_NAMES::NO_PIECE);
     }
 
     if(at(tx, ty).name == PIECE_NAMES::KING and mv.delta_x == -2){
         Piece tmp = at(0, fy);
         setAt(3, fy, tmp);
+        board[fy*8+3].moves_done = -1;
         board[0+8*fy] = Piece(PIECE_NAMES::NO_PIECE);
     }
 
