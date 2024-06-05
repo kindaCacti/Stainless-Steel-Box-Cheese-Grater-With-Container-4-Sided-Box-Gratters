@@ -135,6 +135,18 @@ void Board::makeMove(int fx, int fy, Move mv){
     int ty = mv.delta_y + fy;
     board[tx + ty*8] = tmp;
 
+    if(at(tx, ty).name == PIECE_NAMES::KING and mv.delta_x == 2){
+        Piece tmp = at(7, fy);
+        setAt(5, fy, tmp);
+        board[7+8*fy] = Piece(PIECE_NAMES::NO_PIECE);
+    }
+
+    if(at(tx, ty).name == PIECE_NAMES::KING and mv.delta_x == -2){
+        Piece tmp = at(0, fy);
+        setAt(3, fy, tmp);
+        board[0+8*fy] = Piece(PIECE_NAMES::NO_PIECE);
+    }
+
     promote();
 }
 
@@ -168,7 +180,7 @@ std::vector<Move> Board::getMoves(int x, int y, bool check){
             if(at(ex, ey).name != PIECE_NAMES::NO_PIECE){
                 if(at(ex, ey).color != at(x, y).color){
                     Board nextBoard(this->board);
-                    nextBoard.makeMove(ex, ey, sm);
+                    nextBoard.makeMove(x, y, sm);
                     out.push_back(sm);
 
                     if(check and nextBoard.isKingUnderAttack(at(x, y).color)){
@@ -186,7 +198,7 @@ std::vector<Move> Board::getMoves(int x, int y, bool check){
             if(at(ex, ey).name != PIECE_NAMES::NO_PIECE){
                 if(at(ex, ey).color != at(x, y).color){
                     Board nextBoard(this->board);
-                    nextBoard.makeMove(ex, ey, sm);
+                    nextBoard.makeMove(x, y, sm);
 
                     out.push_back(sm);
                     if(check and nextBoard.isKingUnderAttack(at(x, y).color)){
@@ -204,13 +216,46 @@ std::vector<Move> Board::getMoves(int x, int y, bool check){
                     Board nextBoard(this->board);
                     int ex = x;
                     int ey = y + mv.delta_y * 2;
-                    nextBoard.makeMove(ex, ey, sm);
+                    nextBoard.makeMove(x, y, mv);
 
                     out.push_back(mv*2);
                     if(check and nextBoard.isKingUnderAttack(at(x, y).color)){
                         out.pop_back();
                     }
                 }
+            }
+        }
+    }
+
+    if(at(x, y).name == PIECE_NAMES::KING){
+        Move mv = {1, 0};
+        if(at(x, y).moves_done == 0){
+            int i = 1;
+            int k = 4;
+            for(; i<k; i++) if(at(x-i, y).name != PIECE_NAMES::NO_PIECE) break;
+            if(i == k and at(x-i, y).name == PIECE_NAMES::ROOK){
+                int j = 0;
+                for(; j<k; j++){
+                    Board nextBoard(this->board);
+                    nextBoard.makeMove(x, y, mv*(-j));
+                    if(nextBoard.isKingUnderAttack(at(x, y).color)) break;
+                }
+
+                if(j == k) out.push_back(mv*(-2));
+            }
+
+            i = 1;
+            k = 3;
+            for(; i<k; i++) if(at(x+i, y).name != PIECE_NAMES::NO_PIECE) break;
+            if(i == k and at(x+i, y).name == PIECE_NAMES::ROOK){
+                int j = 0;
+                for(; j<k; j++){
+                    Board nextBoard(this->board);
+                    nextBoard.makeMove(x, y, mv*j);
+                    if(nextBoard.isKingUnderAttack(at(x, y).color)) break;
+                }
+
+                if(j == k) out.push_back(mv*2);
             }
         }
     }

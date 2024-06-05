@@ -5,6 +5,8 @@ Game::Game(){
     gameBoard.setPieces();
     turn = PIECE_COLOR::WHITE;
     ongoing = true;
+    checkWhite = false;
+    checkBlack = false;
 }
 
 std::string Game::showGame() const {
@@ -34,7 +36,7 @@ bool Game::choosePiece(char movX, char movY, std::ostream &os) {
     possibleMoves.clear();
     int index = translateToMoveIndex(movX, movY);
     selectedPieceIndex = index;
-    
+
     if (index == -1) {
         os << "Position does not exist!!" << std::endl;
         return false;
