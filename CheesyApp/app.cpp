@@ -106,14 +106,29 @@ void App::mouseButtonCallback(GLFWwindow *window, int button, int action,
       currentElement->setPos(x, y);
       bool promotion = api.getBoard().at(x / 100, 7 - y / 100).moves_done == -1;
       if (promotion) {
-        std::string color(api.getBoard().at(x / 100, 7 - y / 100).color ==
-                                  PIECE_COLOR::WHITE
-                              ? "white"
-                              : "black");
+        for (int i = 0; i < pieceElements.size(); ++i) {
+          if (pieceElements[i] == currentElement) {
+            delete currentElement;
+            std::string color(api.getBoard().at(x / 100, 7 - y / 100).color ==
+                                      PIECE_COLOR::WHITE
+                                  ? "white"
+                                  : "black");
+            std::string path = std::string("res/textures/") + color;
+            pieceElements[i] = new AppElement<ImageRect>(
+                new ImageRect(path + std::string("/Queen.png"), 100, 100),
+                false, true, x, y);
+            break;
+          }
+        }
+      }
+
+      if (api.isEnd(std::cout)) {
+        std::string color(api.turnOf() == PIECE_COLOR::WHITE ? "black"
+                                                             : "white");
         std::string path = std::string("res/textures/") + color;
-        *currentElement = new AppElement<ImageRect>(
-            new ImageRect(path + std::string("/Queen.png"), 100, 100), false,
-            true, marginLeft + x, y);
+        path += "/Wins.png";
+        pieceElements.push_back(new AppElement<ImageRect>(
+            new ImageRect(path, 800, 400), false, true, 0, 200));
       }
     }
     for (auto element : highlightElements) {
