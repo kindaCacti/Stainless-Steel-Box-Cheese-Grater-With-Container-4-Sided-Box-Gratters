@@ -112,9 +112,13 @@ TEST(TEST_BOARD, GENERATE_MOVES){
 TEST(TEST_BOARD, GET_MOVES_OF_COLOR){
     Board b;
     b.setPieces();
-    int tmp = b.getMovesOfColor(PIECE_COLOR::WHITE).size();
+    auto tmp = b.getMovesOfColor(PIECE_COLOR::WHITE);
 
-    ASSERT_EQ(tmp, 20);
+    for(int i = 0; i<tmp.size(); i++){
+        std::cout<<tmp[i].delta_x<<" "<<tmp[i].delta_y<<std::endl;
+    }
+
+    ASSERT_EQ(tmp.size(), 20);
 }
 
 TEST(TEST_BOARD, MAKE_MOVE){

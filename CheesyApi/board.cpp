@@ -210,7 +210,7 @@ bool Board::canCastle(int x, int y, int way, bool check){
     int k = ((way < 0)? 3 : 4);
     int mul = ((way < 0)? -1 : 1);
     for(int i = 1; i<k; i++){
-        if(at(x, y + i*mul).name != PIECE_NAMES::NO_PIECE) return false;
+        if(at(x + i*mul, y).name != PIECE_NAMES::NO_PIECE) return false;
     }
 
     for(int i = 0; i<k; i++){
@@ -248,7 +248,7 @@ std::vector<Move> Board::getMoves(int x, int y, bool check){
         Move mv1 = { 1, 1};
         Move mv2 = {-1, 1};
         Move dmv = {0, 2};
-        
+
         if(at(x, y).color == PIECE_COLOR::WHITE){
             mv1.delta_y *= -1;
             mv2.delta_y *= -1;
