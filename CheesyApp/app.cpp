@@ -121,6 +121,19 @@ void App::mouseButtonCallback(GLFWwindow *window, int button, int action,
           }
         }
       }
+      bool king =
+          api.getBoard().at(x / 100, 7 - y / 100).name == PIECE_NAMES::KING;
+      if (king) {
+        for (auto element : pieceElements) {
+          auto e = api.getBoard().at(element->getX() / 100,
+                                     7 - element->getY() / 100);
+          if (e.name == PIECE_NAMES::ROOK && e.moves_done == -1) {
+            int nx = element->getX() == 0 ? 3 : 5;
+            element->setPos(nx, element->getY());
+            break;
+          }
+        }
+      }
 
       if (api.isEnd(std::cout)) {
         std::string color(api.turnOf() == PIECE_COLOR::WHITE ? "black"
