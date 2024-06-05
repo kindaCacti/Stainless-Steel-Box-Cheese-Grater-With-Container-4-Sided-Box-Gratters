@@ -28,6 +28,19 @@ public:
   static Position mousePos;
   static Game api;
 
+  static std::string imgDir;
+  static std::string imgDirWhite;
+  static std::string imgDirBlack;
+  static std::string imgNameBoard;
+  static std::string imgNamePawn;
+  static std::string imgNameRook;
+  static std::string imgNameKnight;
+  static std::string imgNameBishop;
+  static std::string imgNameQueen;
+  static std::string imgNameKing;
+  static std::string imgNameWin;
+  static std::string imgNameHighlight;
+
 private:
   GLFWwindow *window;
   int marginLeft = 0;
@@ -38,19 +51,23 @@ public:
 
 private:
   int initWindow(int width, int height, const char *title);
-  void mainLoop();
+  void gameLoop();
 
   void tick(double delta);
   void draw();
 
   void initializeBoard();
-  Position notationToPosition(char x, char y) const;
 
-  void mouseButtonCallback(GLFWwindow *window, int button, int action,
-                           int mods);
   static void cursorPositionCallback(GLFWwindow *window, double xpos,
                                      double ypos);
-  std::string getMove(int srcPosX, int srcPosY, int dstPosX, int dstPosY);
+  void mouseButtonCallback(GLFWwindow *window, int button, int action,
+                           int mods);
 
+  void updateCurrentElement(int x, int y);
   bool moveCurrentElementTo(int x, int y);
+  void removePieceAt(int x, int y);
+  void removeHighlights();
+  void updateHighlights();
+  bool checkIfEnded();
+  std::string movPosToNot(int srcPosX, int srcPosY, int dstPosX, int dstPosY);
 };

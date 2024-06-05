@@ -6,6 +6,20 @@ std::vector<AppElementInterface *> App::highlightElements;
 std::vector<AppElementInterface *> App::pieceElements;
 Game App::api;
 AppElementInterface *App::currentElement = nullptr;
+
+std::string App::imgDir("res/textures/");
+std::string App::imgDirWhite = App::imgDir + std::string("white/");
+std::string App::imgDirBlack = App::imgDir + std::string("black/");
+std::string App::imgNameBoard("Board.png");
+std::string App::imgNamePawn("Pawn.png");
+std::string App::imgNameRook("Rook.png");
+std::string App::imgNameKnight("Knight.png");
+std::string App::imgNameBishop("Bishop.png");
+std::string App::imgNameQueen("Queen.png");
+std::string App::imgNameKing("King.png");
+std::string App::imgNameWin("Win.png");
+std::string App::imgNameHighlight("highlight.png");
+
 App::App() {
   if (initWindow(800, 800, "Say Cheeseee") == -1) {
     throw "Failed to initialize the app!";
@@ -16,199 +30,68 @@ App::App() {
   ImageRect::initializeImageRects();
   initializeBoard();
 
-  mainLoop();
+  gameLoop();
+}
+
+App::~App() {
+  delete boardElement;
+  for (auto element : highlightElements) {
+    delete element;
+  }
+  highlightElements.clear();
+  for (auto element : pieceElements) {
+    delete element;
+  }
+  pieceElements.clear();
+  ImageRect::deinitializeImageRects();
+  glfwTerminate();
 }
 
 void App::initializeBoard() {
-  boardElement = new AppElement<ImageRect>(
-      new ImageRect("res/textures/board.png", 800, 800), false, true,
-      marginLeft, 0);
+  boardElement =
+      new AppElement<ImageRect>(new ImageRect(imgDir + imgNameBoard, 800, 800),
+                                false, true, marginLeft, 0);
 
   for (int i = 0; i < 32; ++i) {
     highlightElements.push_back(new AppElement<ImageRect>(
-        new ImageRect("res/textures/highlight.png", 100, 100), false, true,
-        1000, 1000));
+        new ImageRect(imgDir + imgNameHighlight, 100, 100), false, true, 1000,
+        1000));
   }
 
   int pawnRows[2] = {1, 6};
   int figureRows[2] = {0, 7};
   for (int c = 0; c < 2; ++c) {
-    std::string color(c == 0 ? "white" : "black");
-    std::string path = std::string("res/textures/") + color;
+    std::string dir(c == 0 ? imgDirWhite : imgDirBlack);
     for (int x = 0; x < 8; ++x) {
       pieceElements.push_back(new AppElement<ImageRect>(
-          new ImageRect(path + std::string("/Pawn.png"), 100, 100), false, true,
+          new ImageRect(dir + imgNamePawn, 100, 100), false, true,
           marginLeft + 100 * x, pawnRows[c] * 100));
     }
     pieceElements.push_back(new AppElement<ImageRect>(
-        new ImageRect(path + std::string("/Rook.png"), 100, 100), false, true,
-        marginLeft, figureRows[c] * 100));
+        new ImageRect(dir + imgNameRook, 100, 100), false, true, marginLeft,
+        figureRows[c] * 100));
     pieceElements.push_back(new AppElement<ImageRect>(
-        new ImageRect(path + std::string("/Rook.png"), 100, 100), false, true,
+        new ImageRect(dir + imgNameRook, 100, 100), false, true,
         marginLeft + 700, figureRows[c] * 100));
     pieceElements.push_back(new AppElement<ImageRect>(
-        new ImageRect(path + std::string("/Knight.png"), 100, 100), false, true,
+        new ImageRect(dir + imgNameKnight, 100, 100), false, true,
         marginLeft + 100, figureRows[c] * 100));
     pieceElements.push_back(new AppElement<ImageRect>(
-        new ImageRect(path + std::string("/Knight.png"), 100, 100), false, true,
+        new ImageRect(dir + imgNameKnight, 100, 100), false, true,
         marginLeft + 600, figureRows[c] * 100));
     pieceElements.push_back(new AppElement<ImageRect>(
-        new ImageRect(path + std::string("/Bishop.png"), 100, 100), false, true,
+        new ImageRect(dir + imgNameBishop, 100, 100), false, true,
         marginLeft + 200, figureRows[c] * 100));
     pieceElements.push_back(new AppElement<ImageRect>(
-        new ImageRect(path + std::string("/Bishop.png"), 100, 100), false, true,
+        new ImageRect(dir + imgNameBishop, 100, 100), false, true,
         marginLeft + 500, figureRows[c] * 100));
     pieceElements.push_back(new AppElement<ImageRect>(
-        new ImageRect(path + std::string("/Queen.png"), 100, 100), false, true,
+        new ImageRect(dir + imgNameQueen, 100, 100), false, true,
         marginLeft + 300, figureRows[c] * 100));
     pieceElements.push_back(new AppElement<ImageRect>(
-        new ImageRect(path + std::string("/King.png"), 100, 100), false, true,
+        new ImageRect(dir + imgNameKing, 100, 100), false, true,
         marginLeft + 400, figureRows[c] * 100));
   }
-}
-
-Position App::notationToPosition(char x, char y) const {
-  return Position(int(x - 'a') * 100, int(y - '1') * 100);
-}
-
-void App::tick(double delta) {}
-
-void App::draw() {
-  if (boardElement)
-    boardElement->draw();
-  for (auto element : highlightElements) {
-    element->draw();
-  }
-  for (auto element : pieceElements) {
-    element->draw();
-  }
-}
-
-void App::mouseButtonCallback(GLFWwindow *window, int button, int action,
-                              int mods) {
-  if (button != GLFW_MOUSE_BUTTON_LEFT || action != GLFW_RELEASE)
-    return;
-
-  int x = mousePos.x / 100 * 100;
-  int y = (800 - mousePos.y) / 100 * 100;
-
-  bool botMove = moveCurrentElementTo(x, y);
-  if (botMove) {
-    Bot bot(api.getBoard());
-    std::vector<int> mvs = bot.getBestMove(api.getRound(), 2);
-    for (auto element : pieceElements) {
-      if (element->getX() / 100 == mvs[0] &&
-          element->getY() / 100 == 7 - mvs[1]) {
-        currentElement = element;
-        break;
-      }
-    }
-    api.movePiece(bot.convertToChessNotation(mvs[0], 7 - mvs[1]),
-                  bot.convertToChessNotation(mvs[2], 7 - mvs[3]));
-    moveCurrentElementTo(mvs[2] * 100, (7 - mvs[3]) * 100);
-  }
-}
-
-bool App::moveCurrentElementTo(int x, int y) {
-  bool botMove = false;
-  if (currentElement != nullptr) {
-    auto move = getMove(currentElement->getX() / 100,
-                        currentElement->getY() / 100, x / 100, y / 100);
-    bool result = api.movePiece(move.substr(0, 2), move.substr(2, 2));
-    if (result) {
-      botMove = true;
-      for (int i = 0; i < pieceElements.size(); ++i) {
-        if (pieceElements[i]->getX() == x && pieceElements[i]->getY() == y) {
-          delete pieceElements[i];
-          pieceElements.erase(pieceElements.begin() + i);
-        }
-      }
-      currentElement->setPos(x, y);
-      bool promotion = api.getBoard().at(x / 100, 7 - y / 100).moves_done == -1;
-      if (promotion) {
-        for (int i = 0; i < pieceElements.size(); ++i) {
-          if (pieceElements[i] == currentElement) {
-            delete currentElement;
-            std::string color(api.getBoard().at(x / 100, 7 - y / 100).color ==
-                                      PIECE_COLOR::WHITE
-                                  ? "white"
-                                  : "black");
-            std::string path = std::string("res/textures/") + color;
-            pieceElements[i] = new AppElement<ImageRect>(
-                new ImageRect(path + std::string("/Queen.png"), 100, 100),
-                false, true, x, y);
-            break;
-          }
-        }
-      }
-      bool king =
-          api.getBoard().at(x / 100, 7 - y / 100).name == PIECE_NAMES::KING;
-      if (king) {
-        Piece toCheck[2] = {
-            api.getBoard().at(currentElement->getX() / 100 + 1,
-                              7 - currentElement->getY() / 100),
-            api.getBoard().at(currentElement->getX() / 100 - 1,
-                              7 - currentElement->getY() / 100)};
-        for (int i = 0; i < 2; ++i) {
-          Piece &c = toCheck[i];
-          if (c.name == PIECE_NAMES::ROOK && c.moves_done == -1 &&
-              c.color != api.turnOf()) {
-            for (auto element : pieceElements) {
-              if (element->getX() == 0 + (700 * i) &&
-                  element->getY() == currentElement->getY()) {
-                element->setPos(currentElement->getX() + 100 - (200 * i),
-                                currentElement->getY());
-                break;
-              }
-            }
-            break;
-          }
-        }
-      }
-
-      if (api.isEnd(std::cout)) {
-        std::string color(api.turnOf() == PIECE_COLOR::WHITE ? "black"
-                                                             : "white");
-        std::string path = std::string("res/textures/") + color;
-        path += "/Wins.png";
-        pieceElements.push_back(new AppElement<ImageRect>(
-            new ImageRect(path, 800, 400), false, true, 0, 200));
-        botMove = false;
-      }
-    }
-    for (auto element : highlightElements) {
-      element->setPos(1000, 1000);
-    }
-    currentElement = nullptr;
-  }
-
-  for (auto element : pieceElements) {
-    if (element->getX() == x && element->getY() == y) {
-      currentElement = element;
-      if (api.getBoard().at(x / 100, 7 - y / 100).color == api.turnOf()) {
-        highlightElements[0]->setPos(x, y);
-        api.choosePiece((x / 100) + 'a', (y / 100) + '1');
-        api.loadPossibleMoves();
-        auto moves = api.getPossibleMoves();
-        for (int i = 0; i < moves.size(); ++i) {
-          auto &m = moves[i];
-          highlightElements[i + 1]->setPos(x + m.delta_x * 100,
-                                           y - m.delta_y * 100);
-        }
-      }
-    }
-  }
-
-  return botMove;
-}
-
-std::string App::getMove(int srcPosX, int srcPosY, int dstPosX, int dstPosY) {
-  std::string result;
-  result += ('a' + srcPosX);
-  result += ('1' + srcPosY);
-  result += ('a' + dstPosX);
-  result += ('1' + dstPosY);
-  return result;
 }
 
 Position App::mousePos;
@@ -217,22 +100,146 @@ void App::cursorPositionCallback(GLFWwindow *window, double xpos, double ypos) {
   mousePos.y = ypos;
 }
 
-void App::mainLoop() {
-  Renderer renderer;
-  double lastTime = glfwGetTime();
-  while (!glfwWindowShouldClose(window)) {
-    double now = glfwGetTime();
-    double delta = now - lastTime;
-    lastTime = now;
+void App::mouseButtonCallback(GLFWwindow *window, int button, int action,
+                              int mods) {
+  if (button != GLFW_MOUSE_BUTTON_LEFT || action != GLFW_RELEASE)
+    return;
 
-    renderer.clear();
+  int x = mousePos.x / 100;
+  int y = (800 - mousePos.y) / 100;
 
-    tick(delta);
-    draw();
-
-    glfwSwapBuffers(window);
-    glfwPollEvents();
+  if (currentElement == nullptr) {
+    updateCurrentElement(x, y);
+    return;
   }
+
+  bool success = moveCurrentElementTo(x, y);
+  if (success) {
+    Bot bot(api.getBoard());
+    std::vector<int> mvs = bot.getBestMove(api.getRound(), 2);
+    updateCurrentElement(mvs[0], 7 - mvs[1]);
+    moveCurrentElementTo(mvs[2], 7 - mvs[3]);
+    currentElement = nullptr;
+    removeHighlights();
+  } else {
+    updateCurrentElement(x, y);
+  }
+}
+
+void App::updateCurrentElement(int x, int y) {
+  currentElement = nullptr;
+  removeHighlights();
+  for (auto element : pieceElements) {
+    if (element->getX() == x * 100 && element->getY() == y * 100) {
+      if (api.getBoard().at(x, 7 - y).color == api.turnOf()) {
+        currentElement = element;
+        updateHighlights();
+      }
+    }
+  }
+}
+
+bool App::moveCurrentElementTo(int dstX, int dstY) {
+  if (currentElement == nullptr)
+    return false;
+
+  int srcX = currentElement->getX() / 100;
+  int srcY = currentElement->getY() / 100;
+  std::string moveNot = movPosToNot(srcX, srcY, dstX, dstY);
+  bool success = api.movePiece(moveNot.substr(0, 2), moveNot.substr(2, 2));
+  if (!success)
+    return false;
+
+  removePieceAt(dstX, dstY);
+  currentElement->setPos(dstX * 100, dstY * 100);
+
+  Piece pieceInfo = api.getBoard().at(dstX, 7 - dstY);
+  std::string dir(pieceInfo.color == PIECE_COLOR::WHITE ? imgDirWhite
+                                                        : imgDirBlack);
+
+  // promotion check
+  bool promotionOccurred =
+      pieceInfo.name == PIECE_NAMES::QUEEN && pieceInfo.moves_done == -1;
+  if (promotionOccurred) {
+    removePieceAt(dstX, dstY);
+    pieceElements.push_back(
+        new AppElement<ImageRect>(new ImageRect(dir + imgNameQueen, 100, 100),
+                                  false, true, dstX * 100, dstY * 100));
+  }
+
+  // castling check
+  bool isKing = pieceInfo.name == PIECE_NAMES::KING;
+  if (isKing) {
+    Piece toCheck[2] = {api.getBoard().at(dstX + 1, 7 - dstY),
+                        api.getBoard().at(dstX - 1, 7 - dstY)};
+    for (int i = 0; i < 2; ++i) {
+      Piece &c = toCheck[i];
+      if (c.name == PIECE_NAMES::ROOK && c.moves_done == -1 &&
+          c.color != api.turnOf()) {
+        for (auto element : pieceElements) {
+          if (element->getX() == 0 + (700 * i) &&
+              element->getY() == dstY * 100) {
+            element->setPos(dstX * 100 + 100 - (200 * i), dstY * 100);
+            break;
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  return true;
+}
+
+void App::removePieceAt(int x, int y) {
+  for (int i = 0; i < pieceElements.size(); ++i) {
+    if (pieceElements[i]->getX() / 100 == x &&
+        pieceElements[i]->getY() / 100 == y) {
+      delete pieceElements[i];
+      pieceElements.erase(pieceElements.begin() + i);
+    }
+  }
+}
+
+void App::removeHighlights() {
+  for (auto element : highlightElements) {
+    element->setPos(1000, 1000);
+  }
+}
+
+void App::updateHighlights() {
+  removeHighlights();
+  int x = currentElement->getX();
+  int y = currentElement->getY();
+  highlightElements[0]->setPos(x, y);
+  api.choosePiece((x / 100) + 'a', (y / 100) + '1');
+  api.loadPossibleMoves();
+  auto moves = api.getPossibleMoves();
+  for (int i = 0; i < moves.size(); ++i) {
+    auto &m = moves[i];
+    highlightElements[i + 1]->setPos(x + m.delta_x * 100, y - m.delta_y * 100);
+  }
+}
+
+bool App::checkIfEnded() {
+  if (api.isEnd(std::cout)) {
+    std::string dir(api.turnOf() == PIECE_COLOR::WHITE ? imgDirBlack
+                                                       : imgDirWhite);
+    pieceElements.push_back(new AppElement<ImageRect>(
+        new ImageRect(dir + imgNameWin, 800, 400), false, true, 0, 200));
+    return true;
+  }
+  return false;
+}
+
+std::string App::movPosToNot(int srcPosX, int srcPosY, int dstPosX,
+                             int dstPosY) {
+  std::string result;
+  result += ('a' + srcPosX);
+  result += ('1' + srcPosY);
+  result += ('a' + dstPosX);
+  result += ('1' + dstPosY);
+  return result;
 }
 
 int App::initWindow(int width, int height, const char *title) {
@@ -244,6 +251,7 @@ int App::initWindow(int width, int height, const char *title) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
   window = glfwCreateWindow(width, height, title, NULL, NULL);
   if (!window) {
@@ -266,16 +274,33 @@ int App::initWindow(int width, int height, const char *title) {
   return 0;
 }
 
-App::~App() {
-  delete boardElement;
+void App::gameLoop() {
+  Renderer renderer;
+  double lastTime = glfwGetTime();
+  while (!glfwWindowShouldClose(window)) {
+    double now = glfwGetTime();
+    double delta = now - lastTime;
+    lastTime = now;
+
+    renderer.clear();
+
+    tick(delta);
+    draw();
+
+    glfwSwapBuffers(window);
+    glfwPollEvents();
+  }
+}
+
+void App::tick(double delta) {}
+
+void App::draw() {
+  if (boardElement)
+    boardElement->draw();
   for (auto element : highlightElements) {
-    delete element;
+    element->draw();
   }
-  highlightElements.clear();
   for (auto element : pieceElements) {
-    delete element;
+    element->draw();
   }
-  pieceElements.clear();
-  ImageRect::deinitializeImageRects();
-  glfwTerminate();
 }
