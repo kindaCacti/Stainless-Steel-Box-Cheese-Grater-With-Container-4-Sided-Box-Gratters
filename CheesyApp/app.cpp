@@ -92,11 +92,31 @@ void App::mouseButtonCallback(GLFWwindow *window, int button, int action,
   int x = mousePos.x / 100 * 100;
   int y = (800 - mousePos.y) / 100 * 100;
 
+  bool botMove = moveCurrentElementTo(x, y);
+  if (botMove) {
+    Bot bot(api.getBoard());
+    std::vector<int> mvs = bot.getBestMove(api.getRound(), 2);
+    for (auto element : pieceElements) {
+      if (element->getX() / 100 == mvs[0] &&
+          element->getY() / 100 == 7 - mvs[1]) {
+        currentElement = element;
+        break;
+      }
+    }
+    api.movePiece(bot.convertToChessNotation(mvs[0], 7 - mvs[1]),
+                  bot.convertToChessNotation(mvs[2], 7 - mvs[3]));
+    moveCurrentElementTo(mvs[2] * 100, (7 - mvs[3]) * 100);
+  }
+}
+
+bool App::moveCurrentElementTo(int x, int y) {
+  bool botMove = false;
   if (currentElement != nullptr) {
     auto move = getMove(currentElement->getX() / 100,
                         currentElement->getY() / 100, x / 100, y / 100);
     bool result = api.movePiece(move.substr(0, 2), move.substr(2, 2));
     if (result) {
+      botMove = true;
       for (int i = 0; i < pieceElements.size(); ++i) {
         if (pieceElements[i]->getX() == x && pieceElements[i]->getY() == y) {
           delete pieceElements[i];
@@ -153,6 +173,7 @@ void App::mouseButtonCallback(GLFWwindow *window, int button, int action,
         path += "/Wins.png";
         pieceElements.push_back(new AppElement<ImageRect>(
             new ImageRect(path, 800, 400), false, true, 0, 200));
+        botMove = false;
       }
     }
     for (auto element : highlightElements) {
@@ -177,6 +198,8 @@ void App::mouseButtonCallback(GLFWwindow *window, int button, int action,
       }
     }
   }
+
+  return botMove;
 }
 
 std::string App::getMove(int srcPosX, int srcPosY, int dstPosX, int dstPosY) {

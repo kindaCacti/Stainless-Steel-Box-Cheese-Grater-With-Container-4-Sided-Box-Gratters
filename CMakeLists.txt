@@ -78,7 +78,7 @@ ${API_FOLDER}/testApi.cpp
 ${BOT_FOLDER}/testBot.cpp
 )
 
-include_directories(${THIRD_PARTY_FOLDER} ${ENGINE_FOLDER} ${API_FOLDER})
+include_directories(${THIRD_PARTY_FOLDER} ${ENGINE_FOLDER} ${API_FOLDER} ${BOT_FOLDER})
 
 add_executable(demo main.cpp ${DEMO_SOURCES} )
 add_executable(app ${APP_FOLDER}/main.cpp ${PROJECT_SOURCES} )

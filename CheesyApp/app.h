@@ -1,5 +1,6 @@
 #pragma once
 #include "appElement.h"
+#include "bot.h"
 #include "game.h"
 #include "imageRect.h"
 #include "renderer.h"
@@ -50,4 +51,6 @@ private:
   static void cursorPositionCallback(GLFWwindow *window, double xpos,
                                      double ypos);
   std::string getMove(int srcPosX, int srcPosY, int dstPosX, int dstPosY);
+
+  bool moveCurrentElementTo(int x, int y);
 };
