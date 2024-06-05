@@ -59,6 +59,7 @@ std::string Board::toString() const{
 }
 
 Piece Board::at(int x, int y){
+    if(x<0 or x > 7 or y<0 or y>7) return Piece(PIECE_NAMES::NO_PIECE);
     int index = y*8 + x;
     return board[index];
 }
