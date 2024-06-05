@@ -11,6 +11,7 @@ class Game {
   bool ongoing;
   int selectedPieceIndex;
   std::vector<Move> possibleMoves;
+  bool checkWhite, checkBlack;
 
 public:
   Game();
