@@ -207,7 +207,7 @@ bool Board::canCastle(int x, int y, int way, bool check){
     if(cp.moves_done != 0) return false;
 
     Move mv = {1, 0};
-    int k = ((way < 0)? 3 : 4);
+    int k = ((way < 0)? 4 : 3);
     int mul = ((way < 0)? -1 : 1);
     for(int i = 1; i<k; i++){
         if(at(x + i*mul, y).name != PIECE_NAMES::NO_PIECE) return false;
